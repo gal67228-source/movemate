@@ -26,9 +26,9 @@ Install the current Flutter stable SDK, clone the repository, and run:
 flutter run
 ```
 
-On Windows Command Prompt, use:
+On Windows PowerShell, use:
 
-```bat
+```powershell
 flutter create . --platforms=android --org com.movemate --project-name movemate
 flutter pub get
 flutter run
@@ -84,77 +84,12 @@ flutter build apk --release
 - Add rooms and boxes
 - Calculate real dashboard progress
 
-## One-command GitHub publishing
+## GitHub Copilot
 
-The project includes an automatic publishing tool. It:
+Project-wide development rules are stored in:
 
-1. Installs Flutter packages.
-2. Formats the Dart source.
-3. Runs static analysis and tests.
-4. Builds a local debug APK unless disabled.
-5. Stages all changes and creates a Git commit.
-6. Pushes the current branch to `origin`.
-7. Waits for the matching GitHub Actions run when GitHub CLI is installed.
-
-### macOS / Linux
-
-```bash
-./scripts/publish.sh "Describe the change"
+```text
+.github/copilot-instructions.md
 ```
 
-### Windows
-
-Double-click `publish.bat`, or run from Command Prompt:
-
-```bat
-publish.bat "Describe the change"
-```
-
-The Windows launcher calls the cross-platform `scripts\publish.py` script directly. PowerShell is not used.
-
-### Useful options
-
-macOS / Linux:
-
-```bash
-./scripts/publish.sh "Update dashboard" --skip-local-build
-./scripts/publish.sh "Small documentation update" --skip-checks
-./scripts/publish.sh "Push without waiting" --no-wait
-./scripts/publish.sh "Open CI page" --open
-```
-
-Windows Command Prompt:
-
-```bat
-publish.bat "Update dashboard" --skip-local-build
-publish.bat "Small documentation update" --skip-checks
-publish.bat "Push without waiting" --no-wait
-publish.bat "Open CI page" --open
-```
-
-`--skip-checks` should be used only when necessary. GitHub Actions still performs
-all required CI checks after the push.
-
-### Optional GitHub CLI integration
-
-Install GitHub CLI and authenticate once:
-
-```bash
-gh auth login
-```
-
-After that, the publishing tool waits for the CI result and returns a failure exit
-code when the workflow fails. Without `gh`, pushing still starts CI automatically,
-but the tool only prints the GitHub Actions address.
-
-### First-time setup
-
-The repository must already have an `origin` remote:
-
-```bash
-git remote add origin https://github.com/YOUR_USERNAME/movemate.git
-git branch -M main
-git push -u origin main
-```
-
-After the first setup, use only the publishing command for normal updates.
+GitHub Copilot uses this file as repository instructions so generated changes follow MoveMate's Flutter architecture, Hebrew RTL requirements, Riverpod/Drift conventions, testing rules, and CI standards.
