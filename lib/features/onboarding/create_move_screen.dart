@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class CreateMoveScreen extends StatefulWidget {
+import '../moves/data/move_repository.dart';
+import '../moves/domain/move_plan.dart';
+import '../tasks/data/task_repository.dart';
+
+class CreateMoveScreen extends ConsumerStatefulWidget {
   const CreateMoveScreen({super.key});
 
   @override
-  State<CreateMoveScreen> createState() => _CreateMoveScreenState();
+  ConsumerState<CreateMoveScreen> createState() => _CreateMoveScreenState();
 }
 
-class _CreateMoveScreenState extends State<CreateMoveScreen> {
+class _CreateMoveScreenState extends ConsumerState<CreateMoveScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController(text: 'המעבר שלנו');
   final _fromController = TextEditingController();
   final _toController = TextEditingController();
   DateTime? _moveDate;
   double _rooms = 3;
+  bool _hasStorage = false;
+  bool _hasBalcony = false;
+  bool _hasElevator = false;
+  bool _saving = false;
 
   @override
   void dispose() {
@@ -35,12 +44,35 @@ class _CreateMoveScreenState extends State<CreateMoveScreen> {
     if (date != null) setState(() => _moveDate = date);
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_moveDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('יש לבחור תאריך מעבר')));
       return;
     }
+
+    setState(() => _saving = true);
+    final move = MovePlan(
+      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      name: _nameController.text.trim(),
+      fromAddress: _fromController.text.trim(),
+      toAddress: _toController.text.trim(),
+      moveDate: _moveDate!,
+      roomCount: _rooms.toInt(),
+      hasStorage: _hasStorage,
+      hasBalcony: _hasBalcony,
+      hasElevator: _hasElevator,
+    );
+
+    final moveRepository = await ref.read(moveRepositoryProvider.future);
+    await moveRepository.saveMove(move);
+    final taskRepository = await ref.read(taskRepositoryProvider.future);
+    await taskRepository.seedDefaults(moveId: move.id, moveDate: move.moveDate);
+    ref.invalidate(currentMoveProvider);
+    ref.invalidate(tasksProvider);
+    ref.invalidate(taskStatsProvider);
+
+    if (!mounted) return;
     context.go('/dashboard');
   }
 
@@ -76,8 +108,17 @@ class _CreateMoveScreenState extends State<CreateMoveScreen> {
             const SizedBox(height: 22),
             Text('מספר חדרים: ${_rooms.toInt()}', style: Theme.of(context).textTheme.titleMedium),
             Slider(value: _rooms, min: 1, max: 8, divisions: 7, label: _rooms.toInt().toString(), onChanged: (value) => setState(() => _rooms = value)),
-            const SizedBox(height: 28),
-            FilledButton(onPressed: _submit, child: const Padding(padding: EdgeInsets.symmetric(vertical: 14), child: Text('יצירת המעבר'))),
+            SwitchListTile(title: const Text('יש מחסן'), value: _hasStorage, onChanged: (value) => setState(() => _hasStorage = value)),
+            SwitchListTile(title: const Text('יש מרפסת'), value: _hasBalcony, onChanged: (value) => setState(() => _hasBalcony = value)),
+            SwitchListTile(title: const Text('יש מעלית'), value: _hasElevator, onChanged: (value) => setState(() => _hasElevator = value)),
+            const SizedBox(height: 20),
+            FilledButton(
+              onPressed: _saving ? null : _submit,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                child: _saving ? const SizedBox.square(dimension: 22, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('יצירת המעבר'),
+              ),
+            ),
           ],
         ),
       ),

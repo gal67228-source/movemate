@@ -1,5 +1,5 @@
 {
-  "version": "0.1.3",
-  "build": 4,
-  "title": "Fix Riverpod widget test"
+  "version": "0.2.0",
+  "build": 5,
+  "title": "Tasks and local persistence"
 }
