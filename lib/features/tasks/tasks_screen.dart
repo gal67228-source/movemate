@@ -21,7 +21,7 @@ class _TasksScreenState extends State<TasksScreen> {
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
         itemCount: _tasks.length,
-        separatorBuilder: (_, __) => const SizedBox(height: 8),
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
         itemBuilder: (context, index) {
           final task = _tasks[index];
           return Card(

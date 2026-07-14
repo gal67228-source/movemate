@@ -10,10 +10,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
     routes: [
-      GoRoute(path: '/', builder: (_, __) => const WelcomeScreen()),
-      GoRoute(path: '/create-move', builder: (_, __) => const CreateMoveScreen()),
-      GoRoute(path: '/dashboard', builder: (_, __) => const DashboardScreen()),
-      GoRoute(path: '/tasks', builder: (_, __) => const TasksScreen()),
+      GoRoute(path: '/', builder: (context, state) => const WelcomeScreen()),
+      GoRoute(path: '/create-move', builder: (context, state) => const CreateMoveScreen()),
+      GoRoute(path: '/dashboard', builder: (context, state) => const DashboardScreen()),
+      GoRoute(path: '/tasks', builder: (context, state) => const TasksScreen()),
     ],
   );
 });
