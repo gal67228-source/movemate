@@ -28,3 +28,12 @@ GitHub Actions מריץ format, analyze, tests ובניית APK מסוג release
 - Packing inventory with room, destination and packed status
 - Numbered moving boxes with contents, fragile flag and closed status
 - Live packing progress on the dashboard
+
+## גרסה 0.4.0 — Smart Box Manager
+
+- יצירה ועריכה של ארגזים
+- חיפוש לפי מספר, חדר, שם או תכולה
+- סטטוסים מהכנה ועד פריקה
+- סימון משקל ותכולה שבירה
+- הערות ותאריכי אריזה/פריקה
+- תאימות לארגזים שנשמרו בגרסאות קודמות

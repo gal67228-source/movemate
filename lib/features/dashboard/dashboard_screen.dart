@@ -41,7 +41,9 @@ class DashboardScreen extends ConsumerWidget {
           children: [
             moveAsync.when(
               data: (move) {
-                if (move == null) return const SizedBox.shrink();
+                if (move == null) {
+                  return const SizedBox.shrink();
+                }
                 final days = move.moveDate.difference(DateTime.now()).inDays;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,7 +112,8 @@ class DashboardScreen extends ConsumerWidget {
                       const SizedBox(height: 10),
                       Text(
                         '${stats.packedItems} מתוך ${stats.totalItems} פריטים נארזו · '
-                        '${stats.closedBoxes} מתוך ${stats.boxes} ארגזים נסגרו',
+                        '${stats.closedBoxes} מתוך ${stats.boxes} ארגזים מוכנים · '
+                        '${stats.fragileBoxes} שבירים',
                       ),
                     ],
                   ),

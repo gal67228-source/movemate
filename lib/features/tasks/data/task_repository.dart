@@ -14,11 +14,15 @@ class TaskRepository {
   List<MoveTask> getTasks(String moveId) {
     final tasks = _storage.readObjectList(_tasksKey).map(MoveTask.fromJson).where((task) => task.moveId == moveId).toList();
     tasks.sort((a, b) {
-      if (a.isCompleted != b.isCompleted) return a.isCompleted ? 1 : -1;
+      if (a.isCompleted != b.isCompleted) {
+        return a.isCompleted ? 1 : -1;
+      }
       final aDate = a.dueDate ?? DateTime(9999);
       final bDate = b.dueDate ?? DateTime(9999);
       final dateComparison = aDate.compareTo(bDate);
-      if (dateComparison != 0) return dateComparison;
+      if (dateComparison != 0) {
+        return dateComparison;
+      }
       return b.priority.index.compareTo(a.priority.index);
     });
     return tasks;
@@ -41,7 +45,9 @@ class TaskRepository {
   }
 
   Future<void> seedDefaults({required String moveId, required DateTime moveDate}) async {
-    if (getTasks(moveId).isNotEmpty) return;
+    if (getTasks(moveId).isNotEmpty) {
+      return;
+    }
     final now = DateTime.now();
     final templates = <({String title, int daysBefore, TaskCategory category, TaskPriority priority})>[
       (title: 'להזמין חברת הובלה', daysBefore: 30, category: TaskCategory.moving, priority: TaskPriority.high),
@@ -79,7 +85,9 @@ final taskRepositoryProvider = FutureProvider<TaskRepository>((ref) async {
 
 final tasksProvider = FutureProvider<List<MoveTask>>((ref) async {
   final move = await ref.watch(currentMoveProvider.future);
-  if (move == null) return [];
+  if (move == null) {
+    return [];
+  }
   final repository = await ref.watch(taskRepositoryProvider.future);
   return repository.getTasks(move.id);
 });

@@ -35,11 +35,17 @@ class _TaskEditorScreenState extends ConsumerState<TaskEditorScreen> {
   }
 
   void _loadTask(List<MoveTask> tasks) {
-    if (_loaded) return;
+    if (_loaded) {
+      return;
+    }
     _loaded = true;
-    if (widget.taskId == null) return;
+    if (widget.taskId == null) {
+      return;
+    }
     final matches = tasks.where((task) => task.id == widget.taskId);
-    if (matches.isEmpty) return;
+    if (matches.isEmpty) {
+      return;
+    }
     final task = matches.first;
     _existingTask = task;
     _titleController.text = task.title;
@@ -57,13 +63,19 @@ class _TaskEditorScreenState extends ConsumerState<TaskEditorScreen> {
       firstDate: DateTime(now.year - 1),
       lastDate: DateTime(now.year + 5),
     );
-    if (selected != null) setState(() => _dueDate = selected);
+    if (selected != null) {
+      setState(() => _dueDate = selected);
+    }
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
     final move = await ref.read(currentMoveProvider.future);
-    if (move == null) return;
+    if (move == null) {
+      return;
+    }
     setState(() => _saving = true);
     final now = DateTime.now();
     final task = MoveTask(
@@ -81,7 +93,9 @@ class _TaskEditorScreenState extends ConsumerState<TaskEditorScreen> {
     await repository.upsert(task);
     ref.invalidate(tasksProvider);
     ref.invalidate(taskStatsProvider);
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
     context.pop();
   }
 

@@ -28,10 +28,14 @@ class RoomsScreen extends ConsumerWidget {
         ],
       ),
     );
-    if (name == null || name.isEmpty) return;
+    if (name == null || name.isEmpty) {
+      return;
+    }
     final move = await ref.read(currentMoveProvider.future);
     final repository = await ref.read(packingRepositoryProvider.future);
-    if (move == null) return;
+    if (move == null) {
+      return;
+    }
     await repository.upsertRoom(
       MoveRoom(
         id: 'room_${DateTime.now().microsecondsSinceEpoch}',

@@ -36,7 +36,9 @@ class _TasksScreenState extends ConsumerState<TasksScreen> {
         ],
       ),
     );
-    if (confirmed != true) return;
+    if (confirmed != true) {
+      return;
+    }
     final repository = await ref.read(taskRepositoryProvider.future);
     await repository.delete(task.id);
     ref.invalidate(tasksProvider);
@@ -191,8 +193,12 @@ class _TaskCard extends StatelessWidget {
               ),
               PopupMenuButton<String>(
                 onSelected: (value) {
-                  if (value == 'edit') onEdit();
-                  if (value == 'delete') onDelete();
+                  if (value == 'edit') {
+                    onEdit();
+                  }
+                  if (value == 'delete') {
+                    onDelete();
+                  }
                 },
                 itemBuilder: (context) => const [
                   PopupMenuItem(value: 'edit', child: Text('עריכה')),

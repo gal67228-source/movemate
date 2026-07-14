@@ -36,7 +36,9 @@ class PackingRepository {
   }
 
   Future<void> seedRooms(String moveId, int roomCount) async {
-    if (getRooms(moveId).isNotEmpty) return;
+    if (getRooms(moveId).isNotEmpty) {
+      return;
+    }
     final names = <String>['סלון', 'מטבח', 'חדר שינה'];
     for (var index = 3; index < roomCount; index++) {
       names.add('חדר ${index - 1}');
@@ -157,7 +159,9 @@ final packingRepositoryProvider = FutureProvider<PackingRepository>((ref) async 
 
 final roomsProvider = FutureProvider<List<MoveRoom>>((ref) async {
   final move = await ref.watch(currentMoveProvider.future);
-  if (move == null) return [];
+  if (move == null) {
+    return [];
+  }
   final repository = await ref.watch(packingRepositoryProvider.future);
   await repository.seedRooms(move.id, move.roomCount);
   return repository.getRooms(move.id);
@@ -165,14 +169,18 @@ final roomsProvider = FutureProvider<List<MoveRoom>>((ref) async {
 
 final packingItemsProvider = FutureProvider<List<PackingItem>>((ref) async {
   final move = await ref.watch(currentMoveProvider.future);
-  if (move == null) return [];
+  if (move == null) {
+    return [];
+  }
   final repository = await ref.watch(packingRepositoryProvider.future);
   return repository.getItems(move.id);
 });
 
 final movingBoxesProvider = FutureProvider<List<MovingBox>>((ref) async {
   final move = await ref.watch(currentMoveProvider.future);
-  if (move == null) return [];
+  if (move == null) {
+    return [];
+  }
   final repository = await ref.watch(packingRepositoryProvider.future);
   return repository.getBoxes(move.id);
 });
@@ -185,5 +193,9 @@ final packingStatsProvider = FutureProvider<PackingStats>((ref) async {
     packedItems: items.where((item) => item.status == PackingStatus.packed).length,
     boxes: boxes.length,
     closedBoxes: boxes.where((box) => box.isClosed).length,
+    fragileBoxes: boxes.where((box) => box.fragile).length,
+    unpackedBoxes: boxes
+        .where((box) => box.status == MovingBoxStatus.unpacked)
+        .length,
   );
 });

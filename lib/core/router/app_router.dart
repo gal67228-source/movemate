@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/onboarding/create_move_screen.dart';
 import '../../features/onboarding/startup_screen.dart';
+import '../../features/packing/presentation/box_editor_screen.dart';
 import '../../features/packing/presentation/boxes_screen.dart';
 import '../../features/packing/presentation/packing_items_screen.dart';
 import '../../features/packing/presentation/rooms_screen.dart';
@@ -36,6 +37,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const PackingItemsScreen(),
       ),
       GoRoute(path: '/boxes', builder: (context, state) => const BoxesScreen()),
+      GoRoute(
+        path: '/boxes/edit',
+        builder: (context, state) => BoxEditorScreen(
+          boxId: state.uri.queryParameters['id'],
+        ),
+      ),
     ],
   );
 });

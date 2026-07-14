@@ -10,7 +10,9 @@ class PackingItemsScreen extends ConsumerWidget {
 
   Future<void> _addItem(BuildContext context, WidgetRef ref) async {
     final rooms = await ref.read(roomsProvider.future);
-    if (rooms.isEmpty || !context.mounted) return;
+    if (rooms.isEmpty || !context.mounted) {
+      return;
+    }
     final nameController = TextEditingController();
     var selectedRoom = rooms.first.id;
     var destination = ItemDestination.moving;
@@ -54,10 +56,14 @@ class PackingItemsScreen extends ConsumerWidget {
         ),
       ),
     );
-    if (result != true || nameController.text.trim().isEmpty) return;
+    if (result != true || nameController.text.trim().isEmpty) {
+      return;
+    }
     final move = await ref.read(currentMoveProvider.future);
     final repository = await ref.read(packingRepositoryProvider.future);
-    if (move == null) return;
+    if (move == null) {
+      return;
+    }
     await repository.upsertItem(
       PackingItem(
         id: 'item_${DateTime.now().microsecondsSinceEpoch}',

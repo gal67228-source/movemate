@@ -41,11 +41,15 @@ class _CreateMoveScreenState extends ConsumerState<CreateMoveScreen> {
       firstDate: now,
       lastDate: DateTime(now.year + 3),
     );
-    if (date != null) setState(() => _moveDate = date);
+    if (date != null) {
+      setState(() => _moveDate = date);
+    }
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
     if (_moveDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('יש לבחור תאריך מעבר')));
       return;
@@ -72,7 +76,9 @@ class _CreateMoveScreenState extends ConsumerState<CreateMoveScreen> {
     ref.invalidate(tasksProvider);
     ref.invalidate(taskStatsProvider);
 
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
     context.go('/dashboard');
   }
 

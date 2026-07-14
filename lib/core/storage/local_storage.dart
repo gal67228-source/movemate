@@ -12,13 +12,17 @@ class LocalStorage {
 
   Map<String, Object?>? readObject(String key) {
     final value = _preferences.getString(key);
-    if (value == null) return null;
+    if (value == null) {
+      return null;
+    }
     return Map<String, Object?>.from(jsonDecode(value) as Map);
   }
 
   List<Map<String, Object?>> readObjectList(String key) {
     final value = _preferences.getString(key);
-    if (value == null) return [];
+    if (value == null) {
+      return [];
+    }
     return (jsonDecode(value) as List)
         .map((item) => Map<String, Object?>.from(item as Map))
         .toList();
