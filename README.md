@@ -20,3 +20,11 @@
 ## CI
 
 GitHub Actions מריץ format, analyze, tests ובניית APK מסוג release.
+
+## Version 0.3.0
+
+- Automatic room list based on the move setup
+- Add and remove rooms
+- Packing inventory with room, destination and packed status
+- Numbered moving boxes with contents, fragile flag and closed status
+- Live packing progress on the dashboard

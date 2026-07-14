@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../moves/data/move_repository.dart';
+import '../packing/data/packing_repository.dart';
 import '../tasks/data/task_repository.dart';
 import '../../shared/widgets/stat_card.dart';
 
@@ -13,11 +14,12 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final moveAsync = ref.watch(currentMoveProvider);
     final statsAsync = ref.watch(taskStatsProvider);
+    final packingStatsAsync = ref.watch(packingStatsProvider);
     final actions = <({String title, IconData icon, String? route})>[
       (title: 'משימות', icon: Icons.checklist_rounded, route: '/tasks'),
-      (title: 'ארגזים', icon: Icons.inventory_2_outlined, route: null),
-      (title: 'חדרים', icon: Icons.meeting_room_outlined, route: null),
-      (title: 'מכירה', icon: Icons.sell_outlined, route: null),
+      (title: 'ארגזים', icon: Icons.inventory_2_outlined, route: '/boxes'),
+      (title: 'חדרים', icon: Icons.meeting_room_outlined, route: '/rooms'),
+      (title: 'ציוד', icon: Icons.category_outlined, route: '/packing-items'),
       (title: 'קניות', icon: Icons.shopping_cart_outlined, route: null),
       (title: 'תקציב', icon: Icons.account_balance_wallet_outlined, route: null),
     ];
@@ -29,6 +31,9 @@ class DashboardScreen extends ConsumerWidget {
           ref.invalidate(currentMoveProvider);
           ref.invalidate(tasksProvider);
           ref.invalidate(taskStatsProvider);
+          ref.invalidate(packingItemsProvider);
+          ref.invalidate(movingBoxesProvider);
+          ref.invalidate(packingStatsProvider);
           await ref.read(taskStatsProvider.future);
         },
         child: ListView(
@@ -75,6 +80,44 @@ class DashboardScreen extends ConsumerWidget {
               ),
               loading: () => const Card(child: Padding(padding: EdgeInsets.all(24), child: LinearProgressIndicator())),
               error: (error, stackTrace) => Card(child: Padding(padding: const EdgeInsets.all(16), child: Text('לא ניתן לטעון משימות: $error'))),
+            ),
+            const SizedBox(height: 16),
+            packingStatsAsync.when(
+              data: (stats) => Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'התקדמות באריזה',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          Text('${(stats.progress * 100).round()}%'),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      LinearProgressIndicator(
+                        value: stats.progress,
+                        minHeight: 10,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '${stats.packedItems} מתוך ${stats.totalItems} פריטים נארזו · '
+                        '${stats.closedBoxes} מתוך ${stats.boxes} ארגזים נסגרו',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (error, stackTrace) => const SizedBox.shrink(),
             ),
             const SizedBox(height: 16),
             SizedBox(
