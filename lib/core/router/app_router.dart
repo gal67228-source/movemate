@@ -8,6 +8,8 @@ import '../../features/packing/presentation/box_editor_screen.dart';
 import '../../features/packing/presentation/boxes_screen.dart';
 import '../../features/packing/presentation/packing_items_screen.dart';
 import '../../features/packing/presentation/rooms_screen.dart';
+import '../../features/sales/presentation/sale_editor_screen.dart';
+import '../../features/sales/presentation/sales_screen.dart';
 import '../../features/tasks/presentation/task_editor_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
 
@@ -37,6 +39,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const PackingItemsScreen(),
       ),
       GoRoute(path: '/boxes', builder: (context, state) => const BoxesScreen()),
+      GoRoute(path: '/sales', builder: (context, state) => const SalesScreen()),
+      GoRoute(
+        path: '/sales/edit',
+        builder: (context, state) => SaleEditorScreen(
+          itemId: state.uri.queryParameters['id'],
+        ),
+      ),
       GoRoute(
         path: '/boxes/edit',
         builder: (context, state) => BoxEditorScreen(

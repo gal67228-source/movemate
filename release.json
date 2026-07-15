@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
-  "build": 8,
-  "title": "Smart Box Manager"
+  "version": "0.5.0",
+  "build": 9,
+  "title": "Sale Manager and data migrations"
 }

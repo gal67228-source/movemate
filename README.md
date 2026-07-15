@@ -37,3 +37,7 @@ GitHub Actions מריץ format, analyze, tests ובניית APK מסוג release
 - סימון משקל ותכולה שבירה
 - הערות ותאריכי אריזה/פריקה
 - תאימות לארגזים שנשמרו בגרסאות קודמות
+
+## Sale Manager (v0.5)
+
+The Sales feature stores asking and sold prices as integer agorot, supports status/category filtering, and loads legacy sale JSON fields without deleting existing local data.

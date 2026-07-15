@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0+9
+
+- Added a complete Sale Manager with create, edit and delete flows.
+- Added sale categories, statuses, asking prices and actual sold prices.
+- Added search, status filters and a quick mark-as-sold action.
+- Added expected and actual revenue summaries to Sales and Dashboard.
+- Added schema-aware JSON loading and compatibility with legacy sale fields.
+- Added sale statistics, migration and search tests.
+
 ## 0.4.0+8
 
 - Added full create and edit flow for moving boxes.

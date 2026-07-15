@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../moves/data/move_repository.dart';
 import '../packing/data/packing_repository.dart';
+import '../sales/data/sale_repository.dart';
 import '../tasks/data/task_repository.dart';
 import '../../shared/widgets/stat_card.dart';
 
@@ -15,12 +16,13 @@ class DashboardScreen extends ConsumerWidget {
     final moveAsync = ref.watch(currentMoveProvider);
     final statsAsync = ref.watch(taskStatsProvider);
     final packingStatsAsync = ref.watch(packingStatsProvider);
+    final saleStatsAsync = ref.watch(saleStatsProvider);
     final actions = <({String title, IconData icon, String? route})>[
       (title: 'משימות', icon: Icons.checklist_rounded, route: '/tasks'),
       (title: 'ארגזים', icon: Icons.inventory_2_outlined, route: '/boxes'),
       (title: 'חדרים', icon: Icons.meeting_room_outlined, route: '/rooms'),
       (title: 'ציוד', icon: Icons.category_outlined, route: '/packing-items'),
-      (title: 'קניות', icon: Icons.shopping_cart_outlined, route: null),
+      (title: 'מכירה', icon: Icons.sell_outlined, route: '/sales'),
       (title: 'תקציב', icon: Icons.account_balance_wallet_outlined, route: null),
     ];
 
@@ -34,6 +36,8 @@ class DashboardScreen extends ConsumerWidget {
           ref.invalidate(packingItemsProvider);
           ref.invalidate(movingBoxesProvider);
           ref.invalidate(packingStatsProvider);
+          ref.invalidate(saleItemsProvider);
+          ref.invalidate(saleStatsProvider);
           await ref.read(taskStatsProvider.future);
         },
         child: ListView(
@@ -114,6 +118,45 @@ class DashboardScreen extends ConsumerWidget {
                         '${stats.packedItems} מתוך ${stats.totalItems} פריטים נארזו · '
                         '${stats.closedBoxes} מתוך ${stats.boxes} ארגזים מוכנים · '
                         '${stats.fragileBoxes} שבירים',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (error, stackTrace) => const SizedBox.shrink(),
+            ),
+            const SizedBox(height: 16),
+            saleStatsAsync.when(
+              data: (stats) => Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'מכירות',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          Text('${stats.soldItems}/${stats.totalItems} נמכרו'),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      LinearProgressIndicator(
+                        value: stats.progress,
+                        minHeight: 10,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '${stats.activeItems} פעילים · '
+                        '${formatShekels(stats.expectedRevenueAgorot)} צפוי · '
+                        '${formatShekels(stats.actualRevenueAgorot)} התקבל',
                       ),
                     ],
                   ),
