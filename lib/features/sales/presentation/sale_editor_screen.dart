@@ -57,10 +57,10 @@ class _SaleEditorScreenState extends ConsumerState<SaleEditorScreen> {
     _existingItem = item;
     _titleController.text = item.title;
     _descriptionController.text = item.description;
-    _askingPriceController.text = _priceInput(item.askingPriceAgorot);
-    _soldPriceController.text = item.soldPriceAgorot == null
+    _askingPriceController.text = _priceInput(item.askingPriceShekels);
+    _soldPriceController.text = item.soldPriceShekels == null
         ? ''
-        : _priceInput(item.soldPriceAgorot!);
+        : _priceInput(item.soldPriceShekels!);
     _buyerController.text = item.buyerName;
     _notesController.text = item.notes;
     _category = item.category;
@@ -87,8 +87,8 @@ class _SaleEditorScreenState extends ConsumerState<SaleEditorScreen> {
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
       category: _category,
-      askingPriceAgorot: _parsePrice(_askingPriceController.text),
-      soldPriceAgorot: _soldPriceController.text.trim().isEmpty
+      askingPriceShekels: _parsePrice(_askingPriceController.text),
+      soldPriceShekels: _soldPriceController.text.trim().isEmpty
           ? null
           : _parsePrice(_soldPriceController.text),
       status: _status,
@@ -165,9 +165,7 @@ class _SaleEditorScreenState extends ConsumerState<SaleEditorScreen> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _askingPriceController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
+                  keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'מחיר מבוקש',
                     prefixText: '₪ ',
@@ -196,9 +194,7 @@ class _SaleEditorScreenState extends ConsumerState<SaleEditorScreen> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _soldPriceController,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
+                    keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                       labelText: 'מחיר מכירה בפועל',
                       prefixText: '₪ ',
@@ -251,7 +247,7 @@ String? _validatePrice(String? value) {
   if (value == null || value.trim().isEmpty) {
     return 'יש להזין מחיר';
   }
-  final parsed = double.tryParse(value.trim().replaceAll(',', '.'));
+  final parsed = int.tryParse(value.trim());
   if (parsed == null || parsed < 0) {
     return 'יש להזין מחיר תקין';
   }
@@ -259,13 +255,7 @@ String? _validatePrice(String? value) {
 }
 
 int _parsePrice(String value) {
-  final parsed = double.tryParse(value.trim().replaceAll(',', '.')) ?? 0;
-  return (parsed * 100).round();
+  return int.tryParse(value.trim()) ?? 0;
 }
 
-String _priceInput(int agorot) {
-  final value = agorot / 100;
-  return value == value.roundToDouble()
-      ? value.toInt().toString()
-      : value.toStringAsFixed(2);
-}
+String _priceInput(int shekels) => shekels.toString();

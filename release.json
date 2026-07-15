@@ -1,5 +1,5 @@
 {
-  "version": "0.5.1",
-  "build": 10,
-  "title": "Fix dashboard currency formatter import"
+  "version": "0.6.0",
+  "build": 12,
+  "title": "Shopping and Budget in shekels"
 }

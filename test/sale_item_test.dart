@@ -5,8 +5,8 @@ void main() {
   SaleItem item({
     String id = '1',
     String title = 'טלוויזיה',
-    int askingPriceAgorot = 100000,
-    int? soldPriceAgorot,
+    int askingPriceShekels = 1000,
+    int? soldPriceShekels,
     SaleStatus status = SaleStatus.published,
   }) {
     return SaleItem(
@@ -15,8 +15,8 @@ void main() {
       title: title,
       description: 'Samsung',
       category: SaleCategory.electronics,
-      askingPriceAgorot: askingPriceAgorot,
-      soldPriceAgorot: soldPriceAgorot,
+      askingPriceShekels: askingPriceShekels,
+      soldPriceShekels: soldPriceShekels,
       status: status,
       buyerName: '',
       notes: '',
@@ -26,13 +26,13 @@ void main() {
     );
   }
 
-  test('calculates expected and actual sale revenue', () {
+  test('calculates expected and actual sale revenue in shekels', () {
     final stats = calculateSaleStats([
       item(),
       item(
         id: '2',
-        askingPriceAgorot: 80000,
-        soldPriceAgorot: 70000,
+        askingPriceShekels: 800,
+        soldPriceShekels: 700,
         status: SaleStatus.sold,
       ),
     ]);
@@ -40,8 +40,8 @@ void main() {
     expect(stats.totalItems, 2);
     expect(stats.activeItems, 1);
     expect(stats.soldItems, 1);
-    expect(stats.expectedRevenueAgorot, 100000);
-    expect(stats.actualRevenueAgorot, 70000);
+    expect(stats.expectedRevenueShekels, 1000);
+    expect(stats.actualRevenueShekels, 700);
   });
 
   test('loads legacy shekel prices and sold flag', () {
@@ -56,9 +56,23 @@ void main() {
     });
 
     expect(legacy.title, 'שולחן');
-    expect(legacy.askingPriceAgorot, 45000);
-    expect(legacy.soldPriceAgorot, 40000);
+    expect(legacy.askingPriceShekels, 450);
+    expect(legacy.soldPriceShekels, 400);
     expect(legacy.status, SaleStatus.sold);
+  });
+
+  test('migrates previous agorot values to whole shekels', () {
+    final previous = SaleItem.fromJson({
+      'id': 'previous',
+      'moveId': 'move-1',
+      'title': 'ספה',
+      'askingPriceAgorot': 125000,
+      'soldPriceAgorot': 110000,
+      'status': 'sold',
+    });
+
+    expect(previous.askingPriceShekels, 1250);
+    expect(previous.soldPriceShekels, 1100);
   });
 
   test('searches by title, description and category', () {

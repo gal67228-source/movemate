@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/budget/presentation/budget_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/onboarding/create_move_screen.dart';
 import '../../features/onboarding/startup_screen.dart';
@@ -10,6 +11,7 @@ import '../../features/packing/presentation/packing_items_screen.dart';
 import '../../features/packing/presentation/rooms_screen.dart';
 import '../../features/sales/presentation/sale_editor_screen.dart';
 import '../../features/sales/presentation/sales_screen.dart';
+import '../../features/shopping/presentation/shopping_screen.dart';
 import '../../features/tasks/presentation/task_editor_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
 
@@ -40,6 +42,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/boxes', builder: (context, state) => const BoxesScreen()),
       GoRoute(path: '/sales', builder: (context, state) => const SalesScreen()),
+      GoRoute(path: '/shopping', builder: (context, state) => const ShoppingScreen()),
+      GoRoute(path: '/budget', builder: (context, state) => const BudgetScreen()),
       GoRoute(
         path: '/sales/edit',
         builder: (context, state) => SaleEditorScreen(

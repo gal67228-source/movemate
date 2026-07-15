@@ -18,8 +18,8 @@ class SaleItem {
     required this.title,
     required this.description,
     required this.category,
-    required this.askingPriceAgorot,
-    required this.soldPriceAgorot,
+    required this.askingPriceShekels,
+    required this.soldPriceShekels,
     required this.status,
     required this.buyerName,
     required this.notes,
@@ -33,8 +33,8 @@ class SaleItem {
   final String title;
   final String description;
   final SaleCategory category;
-  final int askingPriceAgorot;
-  final int? soldPriceAgorot;
+  final int askingPriceShekels;
+  final int? soldPriceShekels;
   final SaleStatus status;
   final String buyerName;
   final String notes;
@@ -51,8 +51,8 @@ class SaleItem {
     String? title,
     String? description,
     SaleCategory? category,
-    int? askingPriceAgorot,
-    int? soldPriceAgorot,
+    int? askingPriceShekels,
+    int? soldPriceShekels,
     bool clearSoldPrice = false,
     SaleStatus? status,
     String? buyerName,
@@ -68,9 +68,10 @@ class SaleItem {
       title: title ?? this.title,
       description: description ?? this.description,
       category: category ?? this.category,
-      askingPriceAgorot: askingPriceAgorot ?? this.askingPriceAgorot,
-      soldPriceAgorot:
-          clearSoldPrice ? null : (soldPriceAgorot ?? this.soldPriceAgorot),
+      askingPriceShekels:
+          askingPriceShekels ?? this.askingPriceShekels,
+      soldPriceShekels:
+          clearSoldPrice ? null : (soldPriceShekels ?? this.soldPriceShekels),
       status: status ?? this.status,
       buyerName: buyerName ?? this.buyerName,
       notes: notes ?? this.notes,
@@ -95,14 +96,14 @@ class SaleItem {
   }
 
   Map<String, Object?> toJson() => {
-        'schemaVersion': 1,
+        'schemaVersion': 2,
         'id': id,
         'moveId': moveId,
         'title': title,
         'description': description,
         'category': category.name,
-        'askingPriceAgorot': askingPriceAgorot,
-        'soldPriceAgorot': soldPriceAgorot,
+        'askingPriceShekels': askingPriceShekels,
+        'soldPriceShekels': soldPriceShekels,
         'status': status.name,
         'buyerName': buyerName,
         'notes': notes,
@@ -112,17 +113,6 @@ class SaleItem {
       };
 
   factory SaleItem.fromJson(Map<String, Object?> json) {
-    final askingPriceAgorot = _readMoneyAgorot(
-      json,
-      agorotKey: 'askingPriceAgorot',
-      legacyShekelsKey: 'askingPrice',
-    );
-    final soldPriceAgorot = _readNullableMoneyAgorot(
-      json,
-      agorotKey: 'soldPriceAgorot',
-      legacyShekelsKey: 'soldPrice',
-    );
-
     return SaleItem(
       id: (json['id'] as String?) ??
           'sale_${DateTime.now().microsecondsSinceEpoch}',
@@ -134,8 +124,18 @@ class SaleItem {
         json['category'] as String?,
         SaleCategory.other,
       ),
-      askingPriceAgorot: askingPriceAgorot,
-      soldPriceAgorot: soldPriceAgorot,
+      askingPriceShekels: _readMoneyShekels(
+        json,
+        shekelsKey: 'askingPriceShekels',
+        legacyShekelsKey: 'askingPrice',
+        legacyAgorotKey: 'askingPriceAgorot',
+      ),
+      soldPriceShekels: _readNullableMoneyShekels(
+        json,
+        shekelsKey: 'soldPriceShekels',
+        legacyShekelsKey: 'soldPrice',
+        legacyAgorotKey: 'soldPriceAgorot',
+      ),
       status: _enumByName(
         SaleStatus.values,
         json['status'] as String?,
@@ -157,15 +157,15 @@ class SaleStats {
     required this.totalItems,
     required this.activeItems,
     required this.soldItems,
-    required this.expectedRevenueAgorot,
-    required this.actualRevenueAgorot,
+    required this.expectedRevenueShekels,
+    required this.actualRevenueShekels,
   });
 
   final int totalItems;
   final int activeItems;
   final int soldItems;
-  final int expectedRevenueAgorot;
-  final int actualRevenueAgorot;
+  final int expectedRevenueShekels;
+  final int actualRevenueShekels;
 
   double get progress => totalItems == 0 ? 0 : soldItems / totalItems;
 }
@@ -176,15 +176,15 @@ SaleStats calculateSaleStats(Iterable<SaleItem> items) {
     totalItems: list.length,
     activeItems: list.where((item) => item.isActive).length,
     soldItems: list.where((item) => item.status == SaleStatus.sold).length,
-    expectedRevenueAgorot: list
+    expectedRevenueShekels: list
         .where((item) => item.isActive)
-        .fold(0, (total, item) => total + item.askingPriceAgorot),
-    actualRevenueAgorot: list
+        .fold(0, (total, item) => total + item.askingPriceShekels),
+    actualRevenueShekels: list
         .where((item) => item.status == SaleStatus.sold)
         .fold(
           0,
           (total, item) =>
-              total + (item.soldPriceAgorot ?? item.askingPriceAgorot),
+              total + (item.soldPriceShekels ?? item.askingPriceShekels),
         ),
   );
 }
@@ -209,12 +209,7 @@ String saleCategoryLabel(SaleCategory category) => switch (category) {
       SaleCategory.other => 'שונות',
     };
 
-String formatShekels(int agorot) {
-  final value = agorot / 100;
-  return value == value.roundToDouble()
-      ? '₪${value.toInt()}'
-      : '₪${value.toStringAsFixed(2)}';
-}
+String formatShekels(int shekels) => '₪$shekels';
 
 T _enumByName<T extends Enum>(List<T> values, String? name, T fallback) {
   for (final value in values) {
@@ -232,33 +227,42 @@ DateTime? _readDate(Object? value) {
   return DateTime.tryParse(value);
 }
 
-int _readMoneyAgorot(
+int _readMoneyShekels(
   Map<String, Object?> json, {
-  required String agorotKey,
+  required String shekelsKey,
   required String legacyShekelsKey,
+  required String legacyAgorotKey,
 }) {
-  final agorot = json[agorotKey];
-  if (agorot is num) {
-    return agorot.round();
+  final shekels = json[shekelsKey];
+  if (shekels is num) {
+    return shekels.round();
   }
-  final legacy = json[legacyShekelsKey];
-  if (legacy is num) {
-    return (legacy * 100).round();
+  final legacyShekels = json[legacyShekelsKey];
+  if (legacyShekels is num) {
+    return legacyShekels.round();
+  }
+  final legacyAgorot = json[legacyAgorotKey];
+  if (legacyAgorot is num) {
+    return (legacyAgorot / 100).round();
   }
   return 0;
 }
 
-int? _readNullableMoneyAgorot(
+int? _readNullableMoneyShekels(
   Map<String, Object?> json, {
-  required String agorotKey,
+  required String shekelsKey,
   required String legacyShekelsKey,
+  required String legacyAgorotKey,
 }) {
-  if (json[agorotKey] == null && json[legacyShekelsKey] == null) {
+  if (json[shekelsKey] == null &&
+      json[legacyShekelsKey] == null &&
+      json[legacyAgorotKey] == null) {
     return null;
   }
-  return _readMoneyAgorot(
+  return _readMoneyShekels(
     json,
-    agorotKey: agorotKey,
+    shekelsKey: shekelsKey,
     legacyShekelsKey: legacyShekelsKey,
+    legacyAgorotKey: legacyAgorotKey,
   );
 }

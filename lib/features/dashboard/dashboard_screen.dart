@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../budget/data/budget_repository.dart';
+import '../budget/domain/budget_models.dart';
 import '../moves/data/move_repository.dart';
 import '../packing/data/packing_repository.dart';
 import '../sales/data/sale_repository.dart';
 import '../sales/domain/sale_item.dart';
+import '../shopping/data/shopping_repository.dart';
 import '../tasks/data/task_repository.dart';
 import '../../shared/widgets/stat_card.dart';
 
@@ -18,13 +21,16 @@ class DashboardScreen extends ConsumerWidget {
     final statsAsync = ref.watch(taskStatsProvider);
     final packingStatsAsync = ref.watch(packingStatsProvider);
     final saleStatsAsync = ref.watch(saleStatsProvider);
+    final shoppingStatsAsync = ref.watch(shoppingStatsProvider);
+    final budgetStatsAsync = ref.watch(budgetStatsProvider);
     final actions = <({String title, IconData icon, String? route})>[
       (title: 'משימות', icon: Icons.checklist_rounded, route: '/tasks'),
       (title: 'ארגזים', icon: Icons.inventory_2_outlined, route: '/boxes'),
       (title: 'חדרים', icon: Icons.meeting_room_outlined, route: '/rooms'),
       (title: 'ציוד', icon: Icons.category_outlined, route: '/packing-items'),
       (title: 'מכירה', icon: Icons.sell_outlined, route: '/sales'),
-      (title: 'תקציב', icon: Icons.account_balance_wallet_outlined, route: null),
+      (title: 'קניות', icon: Icons.shopping_cart_outlined, route: '/shopping'),
+      (title: 'תקציב', icon: Icons.account_balance_wallet_outlined, route: '/budget'),
     ];
 
     return Scaffold(
@@ -39,6 +45,11 @@ class DashboardScreen extends ConsumerWidget {
           ref.invalidate(packingStatsProvider);
           ref.invalidate(saleItemsProvider);
           ref.invalidate(saleStatsProvider);
+          ref.invalidate(shoppingItemsProvider);
+          ref.invalidate(shoppingStatsProvider);
+          ref.invalidate(budgetSettingsProvider);
+          ref.invalidate(expensesProvider);
+          ref.invalidate(budgetStatsProvider);
           await ref.read(taskStatsProvider.future);
         },
         child: ListView(
@@ -156,9 +167,47 @@ class DashboardScreen extends ConsumerWidget {
                       const SizedBox(height: 10),
                       Text(
                         '${stats.activeItems} פעילים · '
-                        '${formatShekels(stats.expectedRevenueAgorot)} צפוי · '
-                        '${formatShekels(stats.actualRevenueAgorot)} התקבל',
+                        '${formatShekels(stats.expectedRevenueShekels)} צפוי · '
+                        '${formatShekels(stats.actualRevenueShekels)} התקבל',
                       ),
+                    ],
+                  ),
+                ),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (error, stackTrace) => const SizedBox.shrink(),
+            ),
+            const SizedBox(height: 16),
+            shoppingStatsAsync.when(
+              data: (stats) => Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('קניות', style: Theme.of(context).textTheme.titleMedium), Text('${stats.purchased}/${stats.total} נקנו')]),
+                      const SizedBox(height: 10),
+                      LinearProgressIndicator(value: stats.progress, minHeight: 10),
+                      const SizedBox(height: 8),
+                      Text('משוער ₪${stats.estimatedTotalShekels} · בפועל ₪${stats.actualTotalShekels}'),
+                    ],
+                  ),
+                ),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (error, stackTrace) => const SizedBox.shrink(),
+            ),
+            const SizedBox(height: 16),
+            budgetStatsAsync.when(
+              data: (stats) => Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('תקציב', style: Theme.of(context).textTheme.titleMedium), Text(formatMoney(stats.actualBalanceShekels))]),
+                      const SizedBox(height: 8),
+                      Text('הוצאות ${formatMoney(stats.actualExpensesShekels)} · מכירות ${formatMoney(stats.saleIncomeShekels)}'),
                     ],
                   ),
                 ),
@@ -207,7 +256,6 @@ class DashboardScreen extends ConsumerWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(onPressed: () => context.push('/tasks/edit'), icon: const Icon(Icons.add), label: const Text('משימה חדשה')),
     );
   }
 }

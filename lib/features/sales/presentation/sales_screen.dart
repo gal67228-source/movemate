@@ -55,7 +55,7 @@ class _SalesScreenState extends ConsumerState<SalesScreen> {
     await repository.upsert(
       item.copyWith(
         status: SaleStatus.sold,
-        soldPriceAgorot: item.soldPriceAgorot ?? item.askingPriceAgorot,
+        soldPriceShekels: item.soldPriceShekels ?? item.askingPriceShekels,
         soldAt: item.soldAt ?? DateTime.now(),
       ),
     );
@@ -130,9 +130,9 @@ class _SalesScreenState extends ConsumerState<SalesScreen> {
                   child: Row(
                     children: [
                       Expanded(child: Text('${stats.totalItems} פריטים')),
-                      Text('${formatShekels(stats.expectedRevenueAgorot)} צפוי'),
+                      Text('${formatShekels(stats.expectedRevenueShekels)} צפוי'),
                       const SizedBox(width: 12),
-                      Text('${formatShekels(stats.actualRevenueAgorot)} התקבל'),
+                      Text('${formatShekels(stats.actualRevenueShekels)} התקבל'),
                     ],
                   ),
                 ),
@@ -208,7 +208,7 @@ class _SalesScreenState extends ConsumerState<SalesScreen> {
                                           Chip(
                                             label: Text(
                                               formatShekels(
-                                                item.askingPriceAgorot,
+                                                item.askingPriceShekels,
                                               ),
                                             ),
                                           ),
@@ -220,7 +220,7 @@ class _SalesScreenState extends ConsumerState<SalesScreen> {
                                           if (item.status == SaleStatus.sold)
                                             Chip(
                                               label: Text(
-                                                'נמכר ב־${formatShekels(item.soldPriceAgorot ?? item.askingPriceAgorot)}',
+                                                'נמכר ב־${formatShekels(item.soldPriceShekels ?? item.askingPriceShekels)}',
                                               ),
                                             ),
                                         ],

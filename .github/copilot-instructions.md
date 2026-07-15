@@ -74,7 +74,7 @@ Do not create empty layers merely to satisfy this structure. Add them when the f
 - Box numbers must be unique within a move, but do not assume they are globally unique.
 - A box contains zero or more box items and belongs to one room.
 - Box status should be modeled as a typed enum, not arbitrary strings.
-- Monetary values must not use floating-point arithmetic. Store amounts as integer minor units, such as agorot, and format them for display as ILS.
+- Monetary values must not use floating-point arithmetic. Store MoveMate monetary amounts as whole integer shekels and format them as ILS. Do not use agorot unless a future requirement explicitly asks for decimal prices.
 - Dates should be stored as real date/time values and formatted only at the presentation layer.
 - Progress calculations must be deterministic, testable, and centralized rather than duplicated across screens.
 

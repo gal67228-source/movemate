@@ -40,4 +40,4 @@ GitHub Actions מריץ format, analyze, tests ובניית APK מסוג release
 
 ## Sale Manager (v0.5)
 
-The Sales feature stores asking and sold prices as integer agorot, supports status/category filtering, and loads legacy sale JSON fields without deleting existing local data.
+The Sales feature stores asking and sold prices as whole integer shekels, supports status/category filtering, and loads legacy sale JSON fields without deleting existing local data.

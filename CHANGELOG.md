@@ -1,3 +1,17 @@
+## 0.6.0+12
+
+- Added shopping list with quantities, statuses and whole-shekel prices.
+- Added moving budget and expense management.
+- Connected sales income, shopping and budget summaries to the dashboard.
+- Added shopping and budget calculation tests.
+
+## 0.5.2+11
+
+- Store sale prices as whole shekels instead of agorot.
+- Migrate existing agorot-based sale data to shekels.
+- Remove the new-task floating button from the Dashboard.
+- Keep task creation available only from the Tasks screen.
+
 # Changelog
 
 ## 0.5.1+10
