@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
-  "build": 9,
-  "title": "Sale Manager and data migrations"
+  "version": "0.5.1",
+  "build": 10,
+  "title": "Fix dashboard currency formatter import"
 }

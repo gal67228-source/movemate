@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../moves/data/move_repository.dart';
 import '../packing/data/packing_repository.dart';
 import '../sales/data/sale_repository.dart';
+import '../sales/domain/sale_item.dart';
 import '../tasks/data/task_repository.dart';
 import '../../shared/widgets/stat_card.dart';
 

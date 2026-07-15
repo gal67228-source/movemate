@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1+10
+
+- Fixed the Dashboard import for the shared `formatShekels` currency formatter.
+- Restored successful static analysis for the Sale Manager dashboard statistics.
+
 ## 0.5.0+9
 
 - Added a complete Sale Manager with create, edit and delete flows.
