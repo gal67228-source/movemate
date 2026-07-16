@@ -6,3 +6,6 @@
 - Added item editor with explicit status selection.
 - Synchronized room inventory with moving box contents and box status.
 - Removed the separate packing-items shortcut from the dashboard.
+
+## 0.7.3+16
+- Restored GitHub Actions and repository configuration files omitted from the previous archive.

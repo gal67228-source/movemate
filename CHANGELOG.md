@@ -50,3 +50,7 @@
 - Added packing dashboard box statistics.
 - Preserved compatibility with boxes saved by version 0.3.
 - Added moving-box model and search tests.
+
+## 0.7.3+16
+- Restored `.github/workflows/flutter-ci.yml` after it was accidentally omitted from the v0.7.2 ZIP.
+- Restored `.github/dependabot.yml`, `.github/copilot-instructions.md`, and `.gitignore`.

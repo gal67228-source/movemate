@@ -1,5 +1,5 @@
 {
-  "version": "0.7.2",
-  "build": 15,
-  "title": "Expanded room catalogs, quantities and sales sync"
+  "version": "0.7.3",
+  "build": 16,
+  "title": "Restore GitHub Actions workflow"
 }
