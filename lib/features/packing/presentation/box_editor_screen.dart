@@ -101,6 +101,7 @@ class _BoxEditorScreenState extends ConsumerState<BoxEditorScreen> {
     );
     await repository.upsertBox(box);
     ref.invalidate(movingBoxesProvider);
+    ref.invalidate(packingItemsProvider);
     ref.invalidate(packingStatsProvider);
     if (mounted) {
       context.pop();

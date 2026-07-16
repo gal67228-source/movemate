@@ -41,3 +41,7 @@ GitHub Actions מריץ format, analyze, tests ובניית APK מסוג release
 ## Sale Manager (v0.5)
 
 The Sales feature stores asking and sold prices as whole integer shekels, supports status/category filtering, and loads legacy sale JSON fields without deleting existing local data.
+
+
+## v0.7.0 Smart Rooms
+Room equipment catalogs, custom items, quick removal, explicit item editing, and synchronized box contents.

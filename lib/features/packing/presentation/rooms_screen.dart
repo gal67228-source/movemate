@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../moves/data/move_repository.dart';
 import '../data/packing_repository.dart';
@@ -36,15 +37,16 @@ class RoomsScreen extends ConsumerWidget {
     if (move == null) {
       return;
     }
-    await repository.upsertRoom(
-      MoveRoom(
-        id: 'room_${DateTime.now().microsecondsSinceEpoch}',
-        moveId: move.id,
-        name: name,
-        createdAt: DateTime.now(),
-      ),
+    final room = MoveRoom(
+      id: 'room_${DateTime.now().microsecondsSinceEpoch}',
+      moveId: move.id,
+      name: name,
+      createdAt: DateTime.now(),
     );
+    await repository.upsertRoom(room);
+    await repository.seedRoomCatalog(room);
     ref.invalidate(roomsProvider);
+    ref.invalidate(packingItemsProvider);
   }
 
   @override
@@ -52,7 +54,7 @@ class RoomsScreen extends ConsumerWidget {
     final roomsAsync = ref.watch(roomsProvider);
     final itemsAsync = ref.watch(packingItemsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('חדרים')),
+      appBar: AppBar(title: const Text('חדרים חכמים')),
       body: roomsAsync.when(
         data: (rooms) => itemsAsync.when(
           data: (items) => ListView.builder(
@@ -61,22 +63,32 @@ class RoomsScreen extends ConsumerWidget {
             itemBuilder: (context, index) {
               final room = rooms[index];
               final roomItems = items.where((item) => item.roomId == room.id).toList();
-              final packed = roomItems.where((item) => item.status == PackingStatus.packed).length;
+              final progressed = roomItems.where((item) => item.status != PackingStatus.atHome).length;
+              final progress = roomItems.isEmpty ? 0.0 : progressed / roomItems.length;
               return Card(
-                child: ListTile(
-                  leading: const CircleAvatar(child: Icon(Icons.meeting_room_outlined)),
-                  title: Text(room.name),
-                  subtitle: Text('${roomItems.length} פריטים · $packed נארזו'),
-                  trailing: roomItems.isEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.delete_outline),
-                          onPressed: () async {
-                            final repository = await ref.read(packingRepositoryProvider.future);
-                            await repository.deleteRoom(room.id);
-                            ref.invalidate(roomsProvider);
-                          },
-                        )
-                      : null,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => context.push('/rooms/${room.id}'),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const CircleAvatar(child: Icon(Icons.meeting_room_outlined)),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text(room.name, style: Theme.of(context).textTheme.titleMedium)),
+                            const Icon(Icons.chevron_left),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        LinearProgressIndicator(value: progress),
+                        const SizedBox(height: 8),
+                        Text('$progressed מתוך ${roomItems.length} פריטים בתהליך · ${(progress * 100).round()}%'),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },

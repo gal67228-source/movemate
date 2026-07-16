@@ -70,7 +70,7 @@ class PackingItemsScreen extends ConsumerWidget {
         moveId: move.id,
         roomId: selectedRoom,
         name: nameController.text.trim(),
-        status: PackingStatus.notPacked,
+        status: PackingStatus.atHome,
         destination: destination,
         createdAt: DateTime.now(),
       ),
@@ -115,7 +115,7 @@ class PackingItemsScreen extends ConsumerWidget {
                       final repository = await ref.read(packingRepositoryProvider.future);
                       await repository.upsertItem(
                         item.copyWith(
-                          status: value == true ? PackingStatus.packed : PackingStatus.notPacked,
+                          status: value == true ? PackingStatus.packed : PackingStatus.atHome,
                         ),
                       );
                       ref.invalidate(packingItemsProvider);

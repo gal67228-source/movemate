@@ -27,7 +27,6 @@ class DashboardScreen extends ConsumerWidget {
       (title: 'משימות', icon: Icons.checklist_rounded, route: '/tasks'),
       (title: 'ארגזים', icon: Icons.inventory_2_outlined, route: '/boxes'),
       (title: 'חדרים', icon: Icons.meeting_room_outlined, route: '/rooms'),
-      (title: 'ציוד', icon: Icons.category_outlined, route: '/packing-items'),
       (title: 'מכירה', icon: Icons.sell_outlined, route: '/sales'),
       (title: 'קניות', icon: Icons.shopping_cart_outlined, route: '/shopping'),
       (title: 'תקציב', icon: Icons.account_balance_wallet_outlined, route: '/budget'),

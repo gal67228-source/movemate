@@ -1,4 +1,15 @@
-enum PackingStatus { notPacked, packed }
+enum PackingStatus { atHome, packed, inBox, loaded, arrived, unpacked }
+
+extension PackingStatusLabel on PackingStatus {
+  String get label => switch (this) {
+        PackingStatus.atHome => 'בבית',
+        PackingStatus.packed => 'נארז',
+        PackingStatus.inBox => 'בארגז',
+        PackingStatus.loaded => 'הועמס',
+        PackingStatus.arrived => 'הגיע',
+        PackingStatus.unpacked => 'נפרק',
+      };
+}
 
 enum ItemDestination { moving, staying, selling, donating }
 
@@ -70,6 +81,10 @@ class PackingItem {
     required this.status,
     required this.destination,
     required this.createdAt,
+    this.linkedBoxId,
+    this.isLarge = false,
+    this.notes = '',
+    this.isCustom = false,
   });
 
   final String id;
@@ -79,12 +94,21 @@ class PackingItem {
   final PackingStatus status;
   final ItemDestination destination;
   final DateTime createdAt;
+  final String? linkedBoxId;
+  final bool isLarge;
+  final String notes;
+  final bool isCustom;
 
   PackingItem copyWith({
     String? roomId,
     String? name,
     PackingStatus? status,
     ItemDestination? destination,
+    String? linkedBoxId,
+    bool clearLinkedBox = false,
+    bool? isLarge,
+    String? notes,
+    bool? isCustom,
   }) =>
       PackingItem(
         id: id,
@@ -94,6 +118,10 @@ class PackingItem {
         status: status ?? this.status,
         destination: destination ?? this.destination,
         createdAt: createdAt,
+        linkedBoxId: clearLinkedBox ? null : linkedBoxId ?? this.linkedBoxId,
+        isLarge: isLarge ?? this.isLarge,
+        notes: notes ?? this.notes,
+        isCustom: isCustom ?? this.isCustom,
       );
 
   Map<String, Object?> toJson() => {
@@ -104,19 +132,35 @@ class PackingItem {
         'status': status.name,
         'destination': destination.name,
         'createdAt': createdAt.toIso8601String(),
+        'linkedBoxId': linkedBoxId,
+        'isLarge': isLarge,
+        'notes': notes,
+        'isCustom': isCustom,
       };
 
-  factory PackingItem.fromJson(Map<String, Object?> json) => PackingItem(
-        id: json['id']! as String,
-        moveId: json['moveId']! as String,
-        roomId: json['roomId']! as String,
-        name: json['name']! as String,
-        status: PackingStatus.values.byName(json['status']! as String),
-        destination: ItemDestination.values.byName(
-          json['destination']! as String,
-        ),
-        createdAt: DateTime.parse(json['createdAt']! as String),
-      );
+  factory PackingItem.fromJson(Map<String, Object?> json) {
+    final rawStatus = json['status'] as String? ?? 'notPacked';
+    final migratedStatus = switch (rawStatus) {
+      'notPacked' => PackingStatus.atHome,
+      'packed' => PackingStatus.packed,
+      _ => PackingStatus.values.byName(rawStatus),
+    };
+    return PackingItem(
+      id: json['id']! as String,
+      moveId: json['moveId']! as String,
+      roomId: json['roomId']! as String,
+      name: json['name']! as String,
+      status: migratedStatus,
+      destination: ItemDestination.values.byName(
+        json['destination'] as String? ?? ItemDestination.moving.name,
+      ),
+      createdAt: DateTime.parse(json['createdAt']! as String),
+      linkedBoxId: json['linkedBoxId'] as String?,
+      isLarge: json['isLarge'] as bool? ?? false,
+      notes: json['notes'] as String? ?? '',
+      isCustom: json['isCustom'] as bool? ?? false,
+    );
+  }
 }
 
 class MovingBox {
@@ -184,15 +228,9 @@ class MovingBox {
     if (normalized.isEmpty) {
       return true;
     }
-    final searchable = <String>[
-      number.toString(),
-      name,
-      roomName,
-      notes,
-      status.label,
-      ...contents,
-    ].join(' ').toLowerCase();
-    return searchable.contains(normalized);
+    return <String>[
+      number.toString(), name, roomName, notes, status.label, ...contents,
+    ].join(' ').toLowerCase().contains(normalized);
   }
 
   Map<String, Object?> toJson() => {
@@ -226,9 +264,7 @@ class MovingBox {
         json['weight'] as String? ?? MovingBoxWeight.medium.name,
       ),
       status: statusName == null
-          ? legacyClosed
-              ? MovingBoxStatus.packed
-              : MovingBoxStatus.preparing
+          ? legacyClosed ? MovingBoxStatus.packed : MovingBoxStatus.preparing
           : MovingBoxStatus.values.byName(statusName),
       notes: json['notes'] as String? ?? '',
       createdAt: DateTime.parse(json['createdAt']! as String),
@@ -254,14 +290,12 @@ class PackingStats {
     this.fragileBoxes = 0,
     this.unpackedBoxes = 0,
   });
-
   final int totalItems;
   final int packedItems;
   final int boxes;
   final int closedBoxes;
   final int fragileBoxes;
   final int unpackedBoxes;
-
   double get progress => totalItems == 0 ? 0 : packedItems / totalItems;
   double get boxProgress => boxes == 0 ? 0 : closedBoxes / boxes;
 }

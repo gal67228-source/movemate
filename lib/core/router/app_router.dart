@@ -7,7 +7,7 @@ import '../../features/onboarding/create_move_screen.dart';
 import '../../features/onboarding/startup_screen.dart';
 import '../../features/packing/presentation/box_editor_screen.dart';
 import '../../features/packing/presentation/boxes_screen.dart';
-import '../../features/packing/presentation/packing_items_screen.dart';
+import '../../features/packing/presentation/room_inventory_screen.dart';
 import '../../features/packing/presentation/rooms_screen.dart';
 import '../../features/sales/presentation/sale_editor_screen.dart';
 import '../../features/sales/presentation/sales_screen.dart';
@@ -37,8 +37,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/rooms', builder: (context, state) => const RoomsScreen()),
       GoRoute(
-        path: '/packing-items',
-        builder: (context, state) => const PackingItemsScreen(),
+        path: '/rooms/:roomId',
+        builder: (context, state) => RoomInventoryScreen(
+          roomId: state.pathParameters['roomId']!,
+        ),
       ),
       GoRoute(path: '/boxes', builder: (context, state) => const BoxesScreen()),
       GoRoute(path: '/sales', builder: (context, state) => const SalesScreen()),

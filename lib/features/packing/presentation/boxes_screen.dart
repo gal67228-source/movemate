@@ -46,6 +46,7 @@ class _BoxesScreenState extends ConsumerState<BoxesScreen> {
     final repository = await ref.read(packingRepositoryProvider.future);
     await repository.deleteBox(box.id);
     ref.invalidate(movingBoxesProvider);
+    ref.invalidate(packingItemsProvider);
     ref.invalidate(packingStatsProvider);
   }
 
@@ -65,6 +66,7 @@ class _BoxesScreenState extends ConsumerState<BoxesScreen> {
       ),
     );
     ref.invalidate(movingBoxesProvider);
+    ref.invalidate(packingItemsProvider);
     ref.invalidate(packingStatsProvider);
   }
 
