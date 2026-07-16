@@ -1,5 +1,5 @@
 {
-  "version": "0.95.1",
-  "build": 23,
-  "title": "Restore GitHub Actions workflow"
+  "version": "0.95.2",
+  "build": 24,
+  "title": "Fix page transition theme compatibility"
 }

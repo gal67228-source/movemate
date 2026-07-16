@@ -1,3 +1,8 @@
+## 0.95.2+24
+
+- Replaced the unavailable Cupertino page transition builder with a Material transition builder compatible with the Flutter version used by CI.
+- Preserved the restored GitHub Actions workflow.
+
 # 0.95.1+23
 
 - Restored the GitHub Actions workflow and hidden GitHub configuration files in the release archive.
