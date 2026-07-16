@@ -1,3 +1,8 @@
+# 0.95.1+23
+
+- Restored the GitHub Actions workflow and hidden GitHub configuration files in the release archive.
+- No application data or feature behavior changed.
+
 # MoveMate Changelog
 
 ## 0.95.0+22

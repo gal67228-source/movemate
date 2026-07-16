@@ -1,5 +1,5 @@
 {
-  "version": "0.95.0",
-  "build": 22,
-  "title": "Polish, accessibility and release hardening"
+  "version": "0.95.1",
+  "build": 23,
+  "title": "Restore GitHub Actions workflow"
 }
