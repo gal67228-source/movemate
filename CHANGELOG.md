@@ -1,3 +1,14 @@
+# Changelog
+
+## 0.97.0+26
+
+- Added Drift with an on-device SQLite database.
+- Added a safe one-time migration from SharedPreferences.
+- Preserved legacy data as a recovery copy.
+- Kept existing repository APIs compatible during the database transition.
+- Added Drift code generation to GitHub Actions.
+- Added migration documentation and compatibility tests.
+
 ## 0.95.2+24
 
 - Replaced the unavailable Cupertino page transition builder with a Material transition builder compatible with the Flutter version used by CI.
@@ -54,7 +65,6 @@
 - Remove the new-task floating button from the Dashboard.
 - Keep task creation available only from the Tasks screen.
 
-# Changelog
 
 ## 0.5.1+10
 

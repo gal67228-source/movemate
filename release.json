@@ -1,5 +1,5 @@
 {
-  "version": "0.96.0",
-  "build": 25,
-  "title": "Settings and overflow menu"
+  "version": "0.97.0",
+  "build": 26,
+  "title": "Drift SQLite foundation and safe legacy migration"
 }
