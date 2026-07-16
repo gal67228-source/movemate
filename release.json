@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0",
-  "build": 13,
-  "title": "Smart Rooms and synced inventory"
+  "version": "0.7.1",
+  "build": 14,
+  "title": "Fix nullable room analyzer error"
 }

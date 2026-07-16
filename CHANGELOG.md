@@ -1,3 +1,8 @@
+## 0.7.1+14
+
+- Fixed nullable room handling in the Smart Rooms inventory screen.
+- Restored strict analyzer compatibility.
+
 ## 0.6.0+12
 
 - Added shopping list with quantities, statuses and whole-shekel prices.

@@ -191,11 +191,12 @@ class RoomInventoryScreen extends ConsumerWidget {
             break;
           }
         }
-        if (room == null) {
+        final selectedRoom = room;
+        if (selectedRoom == null) {
           return const Scaffold(body: Center(child: Text('החדר לא נמצא')));
         }
         return Scaffold(
-          appBar: AppBar(title: Text(room.name)),
+          appBar: AppBar(title: Text(selectedRoom.name)),
           body: itemsAsync.when(
             data: (allItems) => boxesAsync.when(
               data: (boxes) {
@@ -256,7 +257,7 @@ class RoomInventoryScreen extends ConsumerWidget {
             error: (error, stackTrace) => Center(child: Text('שגיאה: $error')),
           ),
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: () => _addItem(context, ref, room),
+            onPressed: () => _addItem(context, ref, selectedRoom),
             icon: const Icon(Icons.add),
             label: const Text('פריט חדש'),
           ),
