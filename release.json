@@ -1,5 +1,5 @@
 {
-  "version": "0.7.4",
-  "build": 17,
-  "title": "Fix async BuildContext analyzer warning"
+  "version": "0.8.0",
+  "build": 19,
+  "title": "Global smart search"
 }

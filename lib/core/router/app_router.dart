@@ -11,6 +11,7 @@ import '../../features/packing/presentation/room_inventory_screen.dart';
 import '../../features/packing/presentation/rooms_screen.dart';
 import '../../features/sales/presentation/sale_editor_screen.dart';
 import '../../features/sales/presentation/sales_screen.dart';
+import '../../features/search/presentation/global_search_screen.dart';
 import '../../features/shopping/presentation/shopping_screen.dart';
 import '../../features/tasks/presentation/task_editor_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
@@ -44,6 +45,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/boxes', builder: (context, state) => const BoxesScreen()),
       GoRoute(path: '/sales', builder: (context, state) => const SalesScreen()),
+      GoRoute(
+        path: '/search',
+        builder: (context, state) => const GlobalSearchScreen(),
+      ),
       GoRoute(path: '/shopping', builder: (context, state) => const ShoppingScreen()),
       GoRoute(path: '/budget', builder: (context, state) => const BudgetScreen()),
       GoRoute(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -50,15 +51,89 @@ class _SalesScreenState extends ConsumerState<SalesScreen> {
     ref.invalidate(saleStatsProvider);
   }
 
-  Future<void> _markSold(SaleItem item) async {
-    final repository = await ref.read(saleRepositoryProvider.future);
-    await repository.upsert(
-      item.copyWith(
-        status: SaleStatus.sold,
-        soldPriceShekels: item.soldPriceShekels ?? item.askingPriceShekels,
-        soldAt: item.soldAt ?? DateTime.now(),
+  Future<int?> _askSoldPrice(SaleItem item) async {
+    final controller = TextEditingController(
+      text: (item.soldPriceShekels ?? item.askingPriceShekels).toString(),
+    );
+    String? validationMessage;
+
+    final price = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('בכמה נמכר ${item.title}?'),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(
+              labelText: 'מחיר מכירה',
+              prefixText: '₪',
+              errorText: validationMessage,
+            ),
+            onSubmitted: (_) {
+              final value = int.tryParse(controller.text.trim());
+              if (value == null || value < 0) {
+                setDialogState(() {
+                  validationMessage = 'יש להזין מחיר תקין בשקלים';
+                });
+                return;
+              }
+              Navigator.pop(dialogContext, value);
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('ביטול'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final value = int.tryParse(controller.text.trim());
+                if (value == null || value < 0) {
+                  setDialogState(() {
+                    validationMessage = 'יש להזין מחיר תקין בשקלים';
+                  });
+                  return;
+                }
+                Navigator.pop(dialogContext, value);
+              },
+              child: const Text('סמן כנמכר'),
+            ),
+          ],
+        ),
       ),
     );
+
+    controller.dispose();
+    return price;
+  }
+
+  Future<void> _setSoldState(SaleItem item, bool sold) async {
+    if (sold) {
+      final soldPrice = await _askSoldPrice(item);
+      if (soldPrice == null) {
+        return;
+      }
+      final repository = await ref.read(saleRepositoryProvider.future);
+      await repository.upsert(
+        item.copyWith(
+          status: SaleStatus.sold,
+          soldPriceShekels: soldPrice,
+          soldAt: DateTime.now(),
+        ),
+      );
+    } else {
+      final repository = await ref.read(saleRepositoryProvider.future);
+      await repository.upsert(
+        item.copyWith(
+          status: SaleStatus.published,
+          clearSoldPrice: true,
+          clearSoldAt: true,
+        ),
+      );
+    }
     ref.invalidate(saleItemsProvider);
     ref.invalidate(saleStatsProvider);
   }
@@ -183,6 +258,17 @@ class _SalesScreenState extends ConsumerState<SalesScreen> {
                             padding: const EdgeInsets.all(12),
                             child: Row(
                               children: [
+                                Checkbox(
+                                  value: item.status == SaleStatus.sold,
+                                  tooltip: item.status == SaleStatus.sold
+                                      ? 'בטל סימון כנמכר'
+                                      : 'סמן כנמכר',
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      _setSoldState(item, value);
+                                    }
+                                  },
+                                ),
                                 CircleAvatar(
                                   child: Icon(_categoryIcon(item.category)),
                                 ),
@@ -235,7 +321,7 @@ class _SalesScreenState extends ConsumerState<SalesScreen> {
                                 PopupMenuButton<String>(
                                   onSelected: (value) {
                                     if (value == 'sold') {
-                                      _markSold(item);
+                                      _setSoldState(item, true);
                                     } else if (value == 'edit') {
                                       context.push('/sales/edit?id=${item.id}');
                                     } else if (value == 'delete') {

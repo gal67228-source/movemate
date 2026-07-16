@@ -24,6 +24,7 @@ class DashboardScreen extends ConsumerWidget {
     final shoppingStatsAsync = ref.watch(shoppingStatsProvider);
     final budgetStatsAsync = ref.watch(budgetStatsProvider);
     final actions = <({String title, IconData icon, String? route})>[
+      (title: 'חיפוש', icon: Icons.search_rounded, route: '/search'),
       (title: 'משימות', icon: Icons.checklist_rounded, route: '/tasks'),
       (title: 'ארגזים', icon: Icons.inventory_2_outlined, route: '/boxes'),
       (title: 'חדרים', icon: Icons.meeting_room_outlined, route: '/rooms'),
@@ -33,7 +34,16 @@ class DashboardScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('MoveMate')),
+      appBar: AppBar(
+        title: const Text('MoveMate'),
+        actions: [
+          IconButton(
+            tooltip: 'חיפוש בכל המעבר',
+            onPressed: () => context.push('/search'),
+            icon: const Icon(Icons.search_rounded),
+          ),
+        ],
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(currentMoveProvider);
