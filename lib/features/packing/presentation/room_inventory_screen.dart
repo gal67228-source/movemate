@@ -151,6 +151,12 @@ class RoomInventoryScreen extends ConsumerWidget {
     final notesController = TextEditingController(text: item.notes);
     final quantityController = TextEditingController(text: '$quantity');
     final salesRepository = await ref.read(saleRepositoryProvider.future);
+    if (!context.mounted) {
+      notesController.dispose();
+      quantityController.dispose();
+      return;
+    }
+
     final existingSales = salesRepository.getItems(item.moveId).where(
           (sale) => sale.sourcePackingItemId == item.id,
         );
