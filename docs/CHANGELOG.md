@@ -1,3 +1,13 @@
+# MoveMate Changelog
+
+## 0.9.0+21
+
+- Added a dedicated Moving Day dashboard.
+- Added explicit box status controls for loaded, arrived, and unpacked states.
+- Added urgent task completion from the Moving Day screen.
+- Added a persistent moving-day checklist with custom items.
+- Added live warnings and summary metrics on the main dashboard.
+
 ## 0.8.1+20
 
 - Fixed compatibility with the Flutter version used by CI.

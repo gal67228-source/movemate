@@ -5,6 +5,7 @@ import '../../features/budget/presentation/budget_screen.dart';
 import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/onboarding/create_move_screen.dart';
 import '../../features/onboarding/startup_screen.dart';
+import '../../features/moving_day/presentation/moving_day_screen.dart';
 import '../../features/packing/presentation/box_editor_screen.dart';
 import '../../features/packing/presentation/boxes_screen.dart';
 import '../../features/packing/presentation/room_inventory_screen.dart';
@@ -30,6 +31,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(path: '/tasks', builder: (context, state) => const TasksScreen()),
+      GoRoute(
+        path: '/moving-day',
+        builder: (context, state) => const MovingDayScreen(),
+      ),
       GoRoute(
         path: '/tasks/edit',
         builder: (context, state) => TaskEditorScreen(

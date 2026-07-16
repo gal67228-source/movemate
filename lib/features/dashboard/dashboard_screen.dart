@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../budget/data/budget_repository.dart';
 import '../budget/domain/budget_models.dart';
 import '../moves/data/move_repository.dart';
+import '../moving_day/data/moving_day_repository.dart';
 import '../packing/data/packing_repository.dart';
 import '../sales/data/sale_repository.dart';
 import '../sales/domain/sale_item.dart';
@@ -23,7 +24,9 @@ class DashboardScreen extends ConsumerWidget {
     final saleStatsAsync = ref.watch(saleStatsProvider);
     final shoppingStatsAsync = ref.watch(shoppingStatsProvider);
     final budgetStatsAsync = ref.watch(budgetStatsProvider);
+    final movingDayStatsAsync = ref.watch(movingDayStatsProvider);
     final actions = <({String title, IconData icon, String? route})>[
+      (title: 'יום המעבר', icon: Icons.local_shipping_rounded, route: '/moving-day'),
       (title: 'חיפוש', icon: Icons.search_rounded, route: '/search'),
       (title: 'משימות', icon: Icons.checklist_rounded, route: '/tasks'),
       (title: 'ארגזים', icon: Icons.inventory_2_outlined, route: '/boxes'),
@@ -59,6 +62,8 @@ class DashboardScreen extends ConsumerWidget {
           ref.invalidate(budgetSettingsProvider);
           ref.invalidate(expensesProvider);
           ref.invalidate(budgetStatsProvider);
+          ref.invalidate(movingDayItemsProvider);
+          ref.invalidate(movingDayStatsProvider);
           await ref.read(taskStatsProvider.future);
         },
         child: ListView(
@@ -83,6 +88,46 @@ class DashboardScreen extends ConsumerWidget {
               error: (error, stackTrace) => Text('שגיאה: $error'),
             ),
             const SizedBox(height: 18),
+            movingDayStatsAsync.when(
+              data: (stats) => Card(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () => context.push('/moving-day'),
+                  child: Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.local_shipping_rounded, size: 36),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'מצב יום המעבר',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                '${stats.loadedBoxes}/${stats.totalBoxes} ארגזים הועמסו · '
+                                '${stats.openTodayTasks} משימות דחופות',
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_left_rounded),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (error, stackTrace) => const SizedBox.shrink(),
+            ),
+            const SizedBox(height: 16),
             statsAsync.when(
               data: (stats) => Card(
                 child: Padding(

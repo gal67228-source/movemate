@@ -45,3 +45,8 @@ The Sales feature stores asking and sold prices as whole integer shekels, suppor
 
 ## v0.7.0 Smart Rooms
 Room equipment catalogs, custom items, quick removal, explicit item editing, and synchronized box contents.
+
+
+## v0.9 Moving Day
+
+The Moving Day screen brings together box loading and arrival status, urgent tasks, and a persistent checklist for important personal items.
