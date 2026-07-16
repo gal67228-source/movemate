@@ -28,6 +28,10 @@ class LocalStorage {
         .toList();
   }
 
+  String? readString(String key) => _preferences.getString(key);
+
+  Future<void> writeString(String key, String value) => _preferences.setString(key, value);
+
   Future<void> writeObject(String key, Map<String, Object?> value) => _preferences.setString(key, jsonEncode(value));
 
   Future<void> writeObjectList(String key, List<Map<String, Object?>> value) => _preferences.setString(key, jsonEncode(value));

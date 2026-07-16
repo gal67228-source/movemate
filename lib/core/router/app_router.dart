@@ -13,6 +13,8 @@ import '../../features/packing/presentation/rooms_screen.dart';
 import '../../features/sales/presentation/sale_editor_screen.dart';
 import '../../features/sales/presentation/sales_screen.dart';
 import '../../features/search/presentation/global_search_screen.dart';
+import '../../features/settings/presentation/about_screen.dart';
+import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/shopping/presentation/shopping_screen.dart';
 import '../../features/tasks/presentation/task_editor_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
@@ -56,6 +58,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/shopping', builder: (context, state) => const ShoppingScreen()),
       GoRoute(path: '/budget', builder: (context, state) => const BudgetScreen()),
+      GoRoute(
+        path: '/settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/about',
+        builder: (context, state) => const AboutScreen(),
+      ),
       GoRoute(
         path: '/sales/edit',
         builder: (context, state) => SaleEditorScreen(

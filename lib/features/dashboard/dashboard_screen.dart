@@ -45,6 +45,29 @@ class DashboardScreen extends ConsumerWidget {
             onPressed: () => context.push('/search'),
             icon: const Icon(Icons.search_rounded),
           ),
+          PopupMenuButton<String>(
+            tooltip: 'אפשרויות נוספות',
+            icon: const Icon(Icons.more_vert_rounded),
+            onSelected: (value) => context.push(value),
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: '/settings',
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.settings_outlined),
+                  title: Text('הגדרות'),
+                ),
+              ),
+              PopupMenuItem(
+                value: '/about',
+                child: ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.info_outline_rounded),
+                  title: Text('אודות'),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       body: RefreshIndicator(

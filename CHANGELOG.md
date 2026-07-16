@@ -83,3 +83,10 @@
 ## 0.7.3+16
 - Restored `.github/workflows/flutter-ci.yml` after it was accidentally omitted from the v0.7.2 ZIP.
 - Restored `.github/dependabot.yml`, `.github/copilot-instructions.md`, and `.gitignore`.
+
+## 0.96.0+25
+
+- Added a three-dot overflow menu on the dashboard.
+- Added settings for move details and theme mode.
+- Added an About screen with app version information.
+- Persisted light, dark, and system theme preferences locally.

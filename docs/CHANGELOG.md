@@ -45,3 +45,9 @@
 
 ## 0.7.3+16
 - Restored GitHub Actions and repository configuration files omitted from the previous archive.
+
+## 0.96.0+25
+
+- Dashboard overflow menu with Settings and About.
+- Editable move name, addresses, and moving date.
+- Persistent system/light/dark appearance selection.

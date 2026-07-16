@@ -1,5 +1,5 @@
 {
-  "version": "0.95.2",
-  "build": 24,
-  "title": "Fix page transition theme compatibility"
+  "version": "0.96.0",
+  "build": 25,
+  "title": "Settings and overflow menu"
 }
