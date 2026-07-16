@@ -1,3 +1,11 @@
+# Changelog
+
+## 0.97.5+31
+
+- Fixed the welcome widget test timeout introduced by asynchronous Drift initialization.
+- Widget tests now override local storage with an in-memory SharedPreferences-backed implementation.
+- Replaced unbounded `pumpAndSettle()` with bounded frame pumps.
+
 ## 0.97.4+30
 
 - Downgraded flutter_riverpod to 2.6.1 for compatibility with Flutter test SDK pins and the Drift code-generation toolchain.
