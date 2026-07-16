@@ -1,3 +1,8 @@
+## 0.97.1+27
+
+- Pin Drift code generation dependencies to versions compatible with the Flutter SDK used by CI.
+- Fix `meta` version solving conflict during `flutter create` / `pub get`.
+
 # Changelog
 
 ## 0.97.0+26

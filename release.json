@@ -1,5 +1,5 @@
 {
-  "version": "0.97.0",
-  "build": 26,
-  "title": "Drift SQLite foundation and safe legacy migration"
+  "version": "0.97.1",
+  "build": 27,
+  "title": "Fix Drift dependency compatibility"
 }
