@@ -1,3 +1,9 @@
+## 0.97.4+30
+
+- Downgraded flutter_riverpod to 2.6.1 for compatibility with Flutter test SDK pins and the Drift code-generation toolchain.
+- Kept Drift 2.26.1, drift_dev 2.26.1, and build_runner 2.4.15 unchanged.
+- No application behavior or stored data format changes.
+
 ## 0.97.1+27
 
 - Pin Drift code generation dependencies to versions compatible with the Flutter SDK used by CI.

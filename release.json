@@ -1,5 +1,5 @@
 {
-  "version": "0.97.3",
-  "build": 29,
-  "title": "Use compatible Drift code generation toolchain"
+  "version": "0.97.4",
+  "build": 30,
+  "title": "Align Riverpod with Flutter test toolchain"
 }
