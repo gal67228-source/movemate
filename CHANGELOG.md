@@ -1,3 +1,8 @@
+## 0.97.2+28
+
+- Align `build_runner` with the `build_resolvers` generation required by `drift_dev 2.28.1`.
+- Run `flutter create` with `--no-pub` so dependency resolution happens in the dedicated CI step.
+
 ## 0.97.1+27
 
 - Pin Drift code generation dependencies to versions compatible with the Flutter SDK used by CI.
