@@ -1,3 +1,9 @@
+## 0.8.1+20
+
+- Fixed compatibility with the Flutter version used by CI.
+- Replaced the unsupported Checkbox tooltip parameter with a Tooltip widget.
+- Removed the unsupported SearchBar autofocus parameter.
+
 # Changelog
 
 ## 0.8.0+19

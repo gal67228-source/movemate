@@ -258,16 +258,18 @@ class _SalesScreenState extends ConsumerState<SalesScreen> {
                             padding: const EdgeInsets.all(12),
                             child: Row(
                               children: [
-                                Checkbox(
-                                  value: item.status == SaleStatus.sold,
-                                  tooltip: item.status == SaleStatus.sold
+                                Tooltip(
+                                  message: item.status == SaleStatus.sold
                                       ? 'בטל סימון כנמכר'
                                       : 'סמן כנמכר',
-                                  onChanged: (value) {
-                                    if (value != null) {
-                                      _setSoldState(item, value);
-                                    }
-                                  },
+                                  child: Checkbox(
+                                    value: item.status == SaleStatus.sold,
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        _setSoldState(item, value);
+                                      }
+                                    },
+                                  ),
                                 ),
                                 CircleAvatar(
                                   child: Icon(_categoryIcon(item.category)),

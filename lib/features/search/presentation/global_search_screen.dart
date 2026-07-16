@@ -34,7 +34,6 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: SearchBar(
               controller: _searchController,
-              autofocus: true,
               hintText: 'חפש פריט, ארגז, משימה, מכירה או קנייה',
               leading: const Icon(Icons.search_rounded),
               trailing: [
