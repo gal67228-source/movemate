@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../storage/local_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const _themeModeKey = 'app_theme_mode';
 
 class AppSettingsRepository {
-  AppSettingsRepository(this._storage);
+  AppSettingsRepository(this._preferences);
 
-  final LocalStorage _storage;
+  final SharedPreferences _preferences;
 
   ThemeMode getThemeMode() {
-    return switch (_storage.readString(_themeModeKey)) {
+    return switch (_preferences.getString(_themeModeKey)) {
       'light' => ThemeMode.light,
       'dark' => ThemeMode.dark,
       _ => ThemeMode.system,
@@ -24,12 +23,17 @@ class AppSettingsRepository {
       ThemeMode.dark => 'dark',
       ThemeMode.system => 'system',
     };
-    return _storage.writeString(_themeModeKey, value);
+    return _preferences.setString(_themeModeKey, value);
   }
 }
 
+final appSettingsPreferencesProvider = FutureProvider<SharedPreferences>(
+  (ref) => SharedPreferences.getInstance(),
+);
+
 final appSettingsRepositoryProvider = FutureProvider<AppSettingsRepository>((ref) async {
-  return AppSettingsRepository(await ref.watch(localStorageProvider.future));
+  final preferences = await ref.watch(appSettingsPreferencesProvider.future);
+  return AppSettingsRepository(preferences);
 });
 
 final themeModeProvider = FutureProvider<ThemeMode>((ref) async {

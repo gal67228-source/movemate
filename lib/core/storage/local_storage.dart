@@ -5,65 +5,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../database/app_database.dart';
 import '../database/database_provider.dart';
+import 'legacy_preferences_migrator.dart';
 
-const _migrationCompleteKey = 'drift_migration_complete_v1';
-
-final sharedPreferencesProvider = FutureProvider<SharedPreferences>(
+final legacyPreferencesProvider = FutureProvider<SharedPreferences>(
   (ref) => SharedPreferences.getInstance(),
 );
 
-/// Compatibility storage facade used by the existing repositories.
+/// Drift-backed compatibility facade used by the existing repositories.
 ///
-/// In production, values are persisted in Drift/SQLite. Reads remain
-/// synchronous because the complete key-value table is loaded into memory when
-/// the provider is initialized. SharedPreferences is retained only for the
-/// one-time migration and lightweight unit tests.
+/// Reads stay synchronous by loading the small key-value table into memory at
+/// startup. All application data writes are persisted exclusively to Drift.
 class LocalStorage {
-  LocalStorage(this._preferences) : _database = null {
-    for (final key in _preferences.getKeys()) {
-      final value = _preferences.getString(key);
-      if (value != null) {
-        _cache[key] = value;
-      }
-    }
-  }
+  LocalStorage._(this._database, this._cache);
 
-  LocalStorage._(this._preferences, this._database);
+  final AppDatabase _database;
+  final Map<String, String> _cache;
 
-  final SharedPreferences _preferences;
-  final AppDatabase? _database;
-  final Map<String, String> _cache = {};
-
-  static Future<LocalStorage> open({
-    required SharedPreferences preferences,
-    required AppDatabase database,
-  }) async {
-    final storage = LocalStorage._(preferences, database);
-    storage._cache.addAll(await database.readAllEntries());
-    await storage._migrateLegacyPreferences();
-    return storage;
-  }
-
-  Future<void> _migrateLegacyPreferences() async {
-    if (_preferences.getBool(_migrationCompleteKey) == true) {
-      return;
-    }
-
-    for (final key in _preferences.getKeys()) {
-      if (key == _migrationCompleteKey || _cache.containsKey(key)) {
-        continue;
-      }
-      final value = _preferences.getString(key);
-      if (value == null) {
-        continue;
-      }
-      _cache[key] = value;
-      await _database!.putEntry(key, value);
-    }
-
-    // The old values are deliberately kept as a recovery copy in v0.97.0.
-    // They can be removed in a later release after the migration is verified.
-    await _preferences.setBool(_migrationCompleteKey, true);
+  static Future<LocalStorage> open(AppDatabase database) async {
+    return LocalStorage._(database, await database.readAllEntries());
   }
 
   Map<String, Object?>? readObject(String key) {
@@ -88,11 +47,7 @@ class LocalStorage {
 
   Future<void> writeString(String key, String value) async {
     _cache[key] = value;
-    if (_database != null) {
-      await _database.putEntry(key, value);
-    } else {
-      await _preferences.setString(key, value);
-    }
+    await _database.putEntry(key, value);
   }
 
   Future<void> writeObject(String key, Map<String, Object?> value) {
@@ -108,7 +63,13 @@ class LocalStorage {
 }
 
 final localStorageProvider = FutureProvider<LocalStorage>((ref) async {
-  final preferences = await ref.watch(sharedPreferencesProvider.future);
   final database = ref.watch(appDatabaseProvider);
-  return LocalStorage.open(preferences: preferences, database: database);
+  final preferences = await ref.watch(legacyPreferencesProvider.future);
+
+  await LegacyPreferencesMigrator(
+    preferences: preferences,
+    database: database,
+  ).migrateIfNeeded();
+
+  return LocalStorage.open(database);
 });

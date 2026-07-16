@@ -1,23 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:movemate/core/database/app_database.dart';
 import 'package:movemate/core/storage/local_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  test('application data is persisted and restored from Drift', () async {
+    final database = AppDatabase.inMemory();
+    addTearDown(database.close);
 
-  test('legacy LocalStorage remains compatible for repository unit tests', () async {
-    SharedPreferences.setMockInitialValues({});
-    final preferences = await SharedPreferences.getInstance();
-    final storage = LocalStorage(preferences);
-
-    await storage.writeObject('move', {'id': 'move-1'});
+    final storage = await LocalStorage.open(database);
+    await storage.writeObject('move', {'name': 'מעבר בדיקה'});
     await storage.writeObjectList('tasks', [
-      {'id': 'task-1'},
+      {'id': '1', 'title': 'לארוז'},
     ]);
 
-    expect(storage.readObject('move'), {'id': 'move-1'});
-    expect(storage.readObjectList('tasks'), [
-      {'id': 'task-1'},
-    ]);
+    final restored = await LocalStorage.open(database);
+    expect(restored.readObject('move')?['name'], 'מעבר בדיקה');
+    expect(restored.readObjectList('tasks').single['title'], 'לארוז');
   });
 }

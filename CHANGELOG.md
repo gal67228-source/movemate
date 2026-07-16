@@ -133,3 +133,12 @@
 - Added settings for move details and theme mode.
 - Added an About screen with app version information.
 - Persisted light, dark, and system theme preferences locally.
+
+## 0.97.6+32
+
+- Made Drift/SQLite the exclusive storage engine for moving data.
+- Extracted the one-time SharedPreferences migration into a dedicated migrator.
+- Kept SharedPreferences only for lightweight application settings and legacy migration.
+- Added an in-memory Drift database for deterministic tests.
+- Added migration and Drift persistence tests.
+- Removed the SharedPreferences fallback path from LocalStorage.

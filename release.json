@@ -1,5 +1,5 @@
 {
-  "version": "0.97.5",
-  "build": 31,
-  "title": "Stabilize widget test with Drift initialization"
+  "version": "0.97.6",
+  "build": 32,
+  "title": "Complete Drift cleanup and migration tests"
 }
