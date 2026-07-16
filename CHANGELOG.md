@@ -1,5 +1,14 @@
 # MoveMate Changelog
 
+## 0.95.0+22
+
+- Unified Material 3 styling across the application.
+- Improved accessibility with consistent 48dp interactive controls.
+- Polished cards, dialogs, forms, chips, progress indicators, and navigation transitions.
+- Added theme regression tests and a full manual QA checklist.
+- CI now builds and uploads both APK and AAB artifacts.
+- Kept all existing local data formats unchanged for safe upgrades.
+
 ## 0.9.0+21
 
 - Added a dedicated Moving Day dashboard.

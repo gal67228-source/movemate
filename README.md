@@ -50,3 +50,8 @@ Room equipment catalogs, custom items, quick removal, explicit item editing, and
 ## v0.9 Moving Day
 
 The Moving Day screen brings together box loading and arrival status, urgent tasks, and a persistent checklist for important personal items.
+
+
+## v0.95 Polish Release
+
+Version 0.95 focuses on consistent Material 3 styling, accessibility, upgrade safety, QA documentation, and release artifacts. GitHub Actions produces both an APK and an AAB. See `docs/QA_CHECKLIST.md` before promoting the project to v1.0.
