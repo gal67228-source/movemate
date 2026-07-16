@@ -19,6 +19,7 @@ class _SaleEditorScreenState extends ConsumerState<SaleEditorScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _quantityController = TextEditingController(text: '1');
   final _askingPriceController = TextEditingController();
   final _soldPriceController = TextEditingController();
   final _buyerController = TextEditingController();
@@ -34,6 +35,7 @@ class _SaleEditorScreenState extends ConsumerState<SaleEditorScreen> {
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
+    _quantityController.dispose();
     _askingPriceController.dispose();
     _soldPriceController.dispose();
     _buyerController.dispose();
@@ -57,6 +59,7 @@ class _SaleEditorScreenState extends ConsumerState<SaleEditorScreen> {
     _existingItem = item;
     _titleController.text = item.title;
     _descriptionController.text = item.description;
+    _quantityController.text = item.quantity.toString();
     _askingPriceController.text = _priceInput(item.askingPriceShekels);
     _soldPriceController.text = item.soldPriceShekels == null
         ? ''
@@ -99,6 +102,8 @@ class _SaleEditorScreenState extends ConsumerState<SaleEditorScreen> {
           ? (_existingItem?.publishedAt ?? now)
           : _existingItem?.publishedAt,
       soldAt: sold ? (_existingItem?.soldAt ?? now) : null,
+      quantity: int.tryParse(_quantityController.text) ?? 1,
+      sourcePackingItemId: _existingItem?.sourcePackingItemId,
     );
     final repository = await ref.read(saleRepositoryProvider.future);
     await repository.upsert(item);
@@ -134,6 +139,19 @@ class _SaleEditorScreenState extends ConsumerState<SaleEditorScreen> {
                   validator: (value) => value == null || value.trim().isEmpty
                       ? 'יש להזין שם פריט'
                       : null,
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _quantityController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'כמות'),
+                  validator: (value) {
+                    final quantity = int.tryParse(value ?? '');
+                    if (quantity == null || quantity < 1) {
+                      return 'יש להזין כמות של 1 ומעלה';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 12),
                 TextFormField(

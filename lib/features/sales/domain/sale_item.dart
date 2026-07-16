@@ -26,6 +26,8 @@ class SaleItem {
     required this.createdAt,
     required this.publishedAt,
     required this.soldAt,
+    this.quantity = 1,
+    this.sourcePackingItemId,
   });
 
   final String id;
@@ -41,6 +43,8 @@ class SaleItem {
   final DateTime createdAt;
   final DateTime? publishedAt;
   final DateTime? soldAt;
+  final int quantity;
+  final String? sourcePackingItemId;
 
   bool get isActive =>
       status == SaleStatus.draft ||
@@ -61,6 +65,9 @@ class SaleItem {
     bool clearPublishedAt = false,
     DateTime? soldAt,
     bool clearSoldAt = false,
+    int? quantity,
+    String? sourcePackingItemId,
+    bool clearSourcePackingItemId = false,
   }) {
     return SaleItem(
       id: id,
@@ -79,6 +86,10 @@ class SaleItem {
       publishedAt:
           clearPublishedAt ? null : (publishedAt ?? this.publishedAt),
       soldAt: clearSoldAt ? null : (soldAt ?? this.soldAt),
+      quantity: quantity ?? this.quantity,
+      sourcePackingItemId: clearSourcePackingItemId
+          ? null
+          : (sourcePackingItemId ?? this.sourcePackingItemId),
     );
   }
 
@@ -96,7 +107,7 @@ class SaleItem {
   }
 
   Map<String, Object?> toJson() => {
-        'schemaVersion': 2,
+        'schemaVersion': 3,
         'id': id,
         'moveId': moveId,
         'title': title,
@@ -110,6 +121,8 @@ class SaleItem {
         'createdAt': createdAt.toIso8601String(),
         'publishedAt': publishedAt?.toIso8601String(),
         'soldAt': soldAt?.toIso8601String(),
+        'quantity': quantity,
+        'sourcePackingItemId': sourcePackingItemId,
       };
 
   factory SaleItem.fromJson(Map<String, Object?> json) {
@@ -148,6 +161,8 @@ class SaleItem {
       createdAt: _readDate(json['createdAt']) ?? DateTime.now(),
       publishedAt: _readDate(json['publishedAt']),
       soldAt: _readDate(json['soldAt']),
+      quantity: ((json['quantity'] as num?)?.toInt() ?? 1).clamp(1, 999).toInt(),
+      sourcePackingItemId: json['sourcePackingItemId'] as String?,
     );
   }
 }

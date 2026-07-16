@@ -199,7 +199,11 @@ class _SalesScreenState extends ConsumerState<SalesScreen> {
                                             .titleMedium,
                                       ),
                                       const SizedBox(height: 4),
-                                      Text(saleCategoryLabel(item.category)),
+                                      Text(
+                                        item.quantity > 1
+                                            ? '${saleCategoryLabel(item.category)} · כמות ${item.quantity}'
+                                            : saleCategoryLabel(item.category),
+                                      ),
                                       const SizedBox(height: 8),
                                       Wrap(
                                         spacing: 8,

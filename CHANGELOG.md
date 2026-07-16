@@ -1,3 +1,11 @@
+## 0.7.2+15
+
+- Expanded the default inventory catalog for every supported room.
+- Added quantity to room inventory and sale items.
+- Automatically creates or updates a sale listing when an inventory item is marked for sale.
+- Added asking price directly to the room-item editor.
+- Keeps linked sale entries synchronized with inventory quantity and name.
+
 ## 0.7.1+14
 
 - Fixed nullable room handling in the Smart Rooms inventory screen.

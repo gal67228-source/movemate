@@ -275,8 +275,10 @@ final packingStatsProvider = FutureProvider<PackingStats>((ref) async {
   final items = await ref.watch(packingItemsProvider.future);
   final boxes = await ref.watch(movingBoxesProvider.future);
   return PackingStats(
-    totalItems: items.length,
-    packedItems: items.where((item) => item.status != PackingStatus.atHome).length,
+    totalItems: items.fold<int>(0, (total, item) => total + item.quantity),
+    packedItems: items
+        .where((item) => item.status != PackingStatus.atHome)
+        .fold<int>(0, (total, item) => total + item.quantity),
     boxes: boxes.length,
     closedBoxes: boxes.where((box) => box.isClosed).length,
     fragileBoxes: boxes.where((box) => box.fragile).length,

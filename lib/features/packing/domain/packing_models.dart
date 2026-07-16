@@ -85,6 +85,7 @@ class PackingItem {
     this.isLarge = false,
     this.notes = '',
     this.isCustom = false,
+    this.quantity = 1,
   });
 
   final String id;
@@ -98,6 +99,7 @@ class PackingItem {
   final bool isLarge;
   final String notes;
   final bool isCustom;
+  final int quantity;
 
   PackingItem copyWith({
     String? roomId,
@@ -109,6 +111,7 @@ class PackingItem {
     bool? isLarge,
     String? notes,
     bool? isCustom,
+    int? quantity,
   }) =>
       PackingItem(
         id: id,
@@ -122,6 +125,7 @@ class PackingItem {
         isLarge: isLarge ?? this.isLarge,
         notes: notes ?? this.notes,
         isCustom: isCustom ?? this.isCustom,
+        quantity: quantity ?? this.quantity,
       );
 
   Map<String, Object?> toJson() => {
@@ -136,6 +140,7 @@ class PackingItem {
         'isLarge': isLarge,
         'notes': notes,
         'isCustom': isCustom,
+        'quantity': quantity,
       };
 
   factory PackingItem.fromJson(Map<String, Object?> json) {
@@ -159,6 +164,7 @@ class PackingItem {
       isLarge: json['isLarge'] as bool? ?? false,
       notes: json['notes'] as String? ?? '',
       isCustom: json['isCustom'] as bool? ?? false,
+      quantity: ((json['quantity'] as num?)?.toInt() ?? 1).clamp(1, 999).toInt(),
     );
   }
 }
