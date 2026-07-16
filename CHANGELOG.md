@@ -1,3 +1,12 @@
+# Changelog
+
+## 0.97.3+29
+
+- Pin Drift and drift_dev to 2.26.1.
+- Pin build_runner to 2.4.15.
+- Keep Android generation on --no-pub so dependency resolution occurs once.
+- Fix pub dependency conflict between build_resolvers 2.x and 3.x.
+
 ## 0.97.2+28
 
 - Align `build_runner` with the `build_resolvers` generation required by `drift_dev 2.28.1`.

@@ -1,5 +1,5 @@
 {
-  "version": "0.97.2",
-  "build": 28,
-  "title": "Fix Drift code generation dependency set"
+  "version": "0.97.3",
+  "build": 29,
+  "title": "Use compatible Drift code generation toolchain"
 }
