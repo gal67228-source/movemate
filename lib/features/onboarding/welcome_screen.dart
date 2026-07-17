@@ -34,22 +34,11 @@ class WelcomeScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
-                  onPressed: () => context.go('/create-move'),
+                  onPressed: () => context.push('/create-move'),
                   icon: const Icon(Icons.add_home_rounded),
                   label: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 14),
                     child: Text('יצירת מעבר חדש'),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => context.go('/dashboard'),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    child: Text('הצגת מסך לדוגמה'),
                   ),
                 ),
               ),

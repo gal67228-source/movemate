@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.98.5+38
+
+- Removed the development-only demo dashboard action from the welcome screen.
+- Opened new-move creation with normal stack navigation.
+- Added an explicit back button to the new-move screen.
+- Added Android back-button handling with confirmation when the form contains unsaved changes.
+- Dismissed the keyboard when tapping outside fields or opening the date picker.
+
 ## 0.98.4+37
 
 - Simplified the Google sign-in screen to the two primary actions.
