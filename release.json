@@ -1,5 +1,5 @@
 {
-  "version": "0.98.1",
-  "build": 34,
-  "title": "Automatic Android signing bootstrap"
+  "version": "0.98.2",
+  "build": 35,
+  "title": "Bundle Firebase Android configuration"
 }

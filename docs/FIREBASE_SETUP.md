@@ -1,3 +1,12 @@
+# Firebase setup
+
+The Android Firebase configuration is bundled at `firebase/google-services.json`.
+GitHub Actions copies it to `android/app/google-services.json` after generating the Android platform files.
+
+The `GOOGLE_SERVICES_JSON_BASE64` repository secret is no longer required.
+
+Google Authentication must still be enabled in Firebase, and the SHA-1/SHA-256 fingerprints of the permanent release signing key must be registered in Firebase.
+
 # Firebase setup for MoveMate v0.98
 
 MoveMate compiles and works in local mode even when Firebase is not configured.

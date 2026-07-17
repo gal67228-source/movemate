@@ -1,3 +1,9 @@
+## 0.98.2+35
+
+- Added the Firebase Android configuration file to the repository package.
+- CI now copies `firebase/google-services.json` into the generated Android project.
+- Removed the requirement for the `GOOGLE_SERVICES_JSON_BASE64` GitHub secret.
+
 # Changelog
 
 ## 0.98.0+33

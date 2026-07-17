@@ -46,17 +46,11 @@ jobs:
           --project-name movemate
           --no-pub
 
-      - name: Configure Firebase Android when secret is available
-        env:
-          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+      - name: Configure Firebase Android
         run: |
-          if [ -n "$GOOGLE_SERVICES_JSON_BASE64" ]; then
-            printf '%s' "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > android/app/google-services.json
-            python3 scripts/enable_google_services.py
-            echo "Firebase Android configuration enabled."
-          else
-            echo "Firebase secret not configured; building with local-mode fallback."
-          fi
+          cp firebase/google-services.json android/app/google-services.json
+          python3 scripts/enable_google_services.py
+          echo "Firebase Android configuration enabled from repository config."
 
       - name: Configure permanent Android signing when secrets are available
         env:
