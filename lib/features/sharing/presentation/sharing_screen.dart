@@ -196,7 +196,7 @@ class _SharingScreenState extends ConsumerState<SharingScreen> {
                                       await Clipboard.setData(
                                         ClipboardData(text: _invite!.code),
                                       );
-                                      if (mounted) {
+                                      if (context.mounted) {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(

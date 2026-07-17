@@ -1,5 +1,5 @@
 {
-  "version": "0.99.0",
-  "build": 39,
-  "title": "Cloud sync and shared moves"
+  "version": "0.99.1",
+  "build": 40,
+  "title": "Fix sharing screen async context lint"
 }

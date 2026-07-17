@@ -1,3 +1,7 @@
+## 0.99.1+40
+
+- Fixed async BuildContext lint in the sharing screen.
+
 # Changelog
 
 ## 0.99.0+39
