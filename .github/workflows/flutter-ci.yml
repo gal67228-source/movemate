@@ -46,6 +46,39 @@ jobs:
           --project-name movemate
           --no-pub
 
+      - name: Configure Firebase Android when secret is available
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON_BASE64" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > android/app/google-services.json
+            python3 scripts/enable_google_services.py
+            echo "Firebase Android configuration enabled."
+          else
+            echo "Firebase secret not configured; building with local-mode fallback."
+          fi
+
+      - name: Configure permanent Android signing when secrets are available
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ] && [ -n "$ANDROID_KEYSTORE_PASSWORD" ] && [ -n "$ANDROID_KEY_ALIAS" ] && [ -n "$ANDROID_KEY_PASSWORD" ]; then
+            printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/movemate-release.jks
+            cat > android/key.properties <<EOF
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyPassword=$ANDROID_KEY_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          storeFile=movemate-release.jks
+          EOF
+            python3 scripts/configure_android_signing.py
+            echo "Permanent Android release signing enabled."
+          else
+            echo "Signing secrets not configured; using Flutter's development signing fallback."
+          fi
+
       - name: Install dependencies
         run: flutter pub get
 

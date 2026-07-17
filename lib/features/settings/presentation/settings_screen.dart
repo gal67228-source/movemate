@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../core/auth/auth_providers.dart';
 import '../../../core/settings/app_settings_repository.dart';
 import '../../moves/data/move_repository.dart';
 import '../../moves/domain/move_plan.dart';
@@ -20,6 +22,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   DateTime? _moveDate;
   MovePlan? _loadedMove;
   bool _saving = false;
+  bool _authWorking = false;
 
   @override
   void dispose() {
@@ -58,16 +61,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       return;
     }
     setState(() => _saving = true);
-    final updated = MovePlan(
-      id: move.id,
+    final updated = move.copyWith(
       name: _nameController.text.trim(),
       fromAddress: _fromController.text.trim(),
       toAddress: _toController.text.trim(),
       moveDate: _moveDate!,
-      roomCount: move.roomCount,
-      hasStorage: move.hasStorage,
-      hasBalcony: move.hasBalcony,
-      hasElevator: move.hasElevator,
     );
     final repository = await ref.read(moveRepositoryProvider.future);
     await repository.saveMove(updated);
@@ -87,16 +85,53 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ref.invalidate(themeModeProvider);
   }
 
+  Future<void> _signIn() async {
+    setState(() => _authWorking = true);
+    try {
+      final service = await ref.read(authServiceProvider.future);
+      final user = await service.signInWithGoogle();
+      final repository = await ref.read(moveRepositoryProvider.future);
+      await repository.assignOwnerToCurrentMove(user.uid);
+      ref.invalidate(authSessionProvider);
+      ref.invalidate(currentMoveProvider);
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('לא ניתן להתחבר: $error')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _authWorking = false);
+      }
+    }
+  }
+
+  Future<void> _signOut() async {
+    setState(() => _authWorking = true);
+    final service = await ref.read(authServiceProvider.future);
+    await service.signOut();
+    ref.invalidate(authSessionProvider);
+    if (!mounted) {
+      return;
+    }
+    setState(() => _authWorking = false);
+    context.go('/');
+  }
+
   @override
   Widget build(BuildContext context) {
     final moveAsync = ref.watch(currentMoveProvider);
     final themeMode = ref.watch(themeModeProvider).value ?? ThemeMode.system;
+    final sessionAsync = ref.watch(authSessionProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('הגדרות')),
       body: moveAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => Center(child: Text('לא ניתן לטעון הגדרות: $error')),
+        error: (error, stackTrace) => Center(
+          child: Text('לא ניתן לטעון הגדרות: $error'),
+        ),
         data: (move) {
           if (move == null) {
             return const Center(child: Text('לא נמצא מעבר פעיל'));
@@ -107,7 +142,80 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                Text('פרטי המעבר', style: Theme.of(context).textTheme.titleLarge),
+                Text('חשבון', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 12),
+                sessionAsync.when(
+                  loading: () => const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(18),
+                      child: LinearProgressIndicator(),
+                    ),
+                  ),
+                  error: (error, stackTrace) => Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.error_outline_rounded),
+                      title: const Text('לא ניתן לטעון את החשבון'),
+                      subtitle: Text('$error'),
+                    ),
+                  ),
+                  data: (session) {
+                    final user = session.user;
+                    return Card(
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: CircleAvatar(
+                              foregroundImage: user?.photoUrl == null
+                                  ? null
+                                  : NetworkImage(user!.photoUrl!),
+                              child: user == null
+                                  ? const Icon(Icons.person_outline_rounded)
+                                  : Text(
+                                      user.displayName.isEmpty
+                                          ? '?'
+                                          : user.displayName.substring(0, 1),
+                                    ),
+                            ),
+                            title: Text(
+                              user?.displayName ?? 'מצב מקומי',
+                            ),
+                            subtitle: Text(
+                              user?.email.isNotEmpty == true
+                                  ? user!.email
+                                  : session.firebaseConfigured
+                                      ? 'הנתונים נשמרים במכשיר בלבד'
+                                      : 'Firebase עדיין לא הוגדר',
+                            ),
+                            trailing: Chip(label: Text(move.plan)),
+                          ),
+                          const Divider(height: 1),
+                          if (user == null)
+                            ListTile(
+                              leading: const Icon(Icons.login_rounded),
+                              title: const Text('התחברות עם Google'),
+                              subtitle: const Text(
+                                'שייך את המעבר לחשבון שלך לקראת סנכרון הענן',
+                              ),
+                              enabled: !_authWorking,
+                              onTap: _signIn,
+                            )
+                          else
+                            ListTile(
+                              leading: const Icon(Icons.logout_rounded),
+                              title: const Text('התנתקות'),
+                              enabled: !_authWorking,
+                              onTap: _signOut,
+                            ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 28),
+                Text(
+                  'פרטי המעבר',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _nameController,
@@ -186,7 +294,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ],
                   ),
                 ),
-
               ],
             ),
           );

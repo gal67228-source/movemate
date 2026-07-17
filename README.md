@@ -62,3 +62,8 @@ Version 0.95 focuses on consistent Material 3 styling, accessibility, upgrade sa
 - Editable move name, addresses, and date
 - Persistent system, light, and dark appearance modes
 - About screen with the installed version
+
+
+## v0.98 authentication
+
+MoveMate now supports a Google identity layer while remaining offline-first. Without Firebase configuration, the app continues to work in local mode. See `docs/FIREBASE_SETUP.md` for the one-time Firebase and GitHub Actions setup.

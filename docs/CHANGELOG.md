@@ -62,3 +62,7 @@
 - Dashboard overflow menu with Settings and About.
 - Editable move name, addresses, and moving date.
 - Persistent system/light/dark appearance selection.
+
+## v0.98.0
+
+Google identity foundation, account ownership fields, local-mode fallback, and Firebase-ready CI configuration.

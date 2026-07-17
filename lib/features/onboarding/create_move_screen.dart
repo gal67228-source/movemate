@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/auth/auth_providers.dart';
 import '../moves/data/move_repository.dart';
 import '../moves/domain/move_plan.dart';
 import '../tasks/data/task_repository.dart';
@@ -56,8 +57,10 @@ class _CreateMoveScreenState extends ConsumerState<CreateMoveScreen> {
     }
 
     setState(() => _saving = true);
+    final now = DateTime.now();
+    final session = await ref.read(authSessionProvider.future);
     final move = MovePlan(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
+      id: now.microsecondsSinceEpoch.toString(),
       name: _nameController.text.trim(),
       fromAddress: _fromController.text.trim(),
       toAddress: _toController.text.trim(),
@@ -66,6 +69,9 @@ class _CreateMoveScreenState extends ConsumerState<CreateMoveScreen> {
       hasStorage: _hasStorage,
       hasBalcony: _hasBalcony,
       hasElevator: _hasElevator,
+      ownerUid: session.user?.uid,
+      createdAt: now,
+      updatedAt: now,
     );
 
     final moveRepository = await ref.read(moveRepositoryProvider.future);

@@ -26,3 +26,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Firebase local configuration
+android/app/google-services.json

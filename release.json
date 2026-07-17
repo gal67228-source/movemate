@@ -1,5 +1,5 @@
 {
-  "version": "0.97.6",
-  "build": 32,
-  "title": "Complete Drift cleanup and migration tests"
+  "version": "0.98.1",
+  "build": 34,
+  "title": "Automatic Android signing bootstrap"
 }
