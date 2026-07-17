@@ -16,6 +16,7 @@ import '../../features/sales/presentation/sales_screen.dart';
 import '../../features/search/presentation/global_search_screen.dart';
 import '../../features/settings/presentation/about_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/sharing/presentation/sharing_screen.dart';
 import '../../features/shopping/presentation/shopping_screen.dart';
 import '../../features/tasks/presentation/task_editor_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
@@ -63,6 +64,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/sharing',
+        builder: (context, state) => const SharingScreen(),
       ),
       GoRoute(
         path: '/about',

@@ -211,6 +211,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     );
                   },
                 ),
+                const SizedBox(height: 14),
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.cloud_sync_rounded),
+                    title: const Text('שיתוף וסנכרון'),
+                    subtitle: const Text('סנכרון בענן והזמנת משתמשים'),
+                    trailing: const Icon(Icons.chevron_left_rounded),
+                    onTap: () => context.push('/sharing'),
+                  ),
+                ),
                 const SizedBox(height: 28),
                 Text(
                   'פרטי המעבר',

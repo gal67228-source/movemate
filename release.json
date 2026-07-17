@@ -1,5 +1,5 @@
 {
-  "version": "0.98.5",
-  "build": 38,
-  "title": "Remove demo preview and improve new move navigation"
+  "version": "0.99.0",
+  "build": 39,
+  "title": "Cloud sync and shared moves"
 }
