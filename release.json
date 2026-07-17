@@ -1,5 +1,5 @@
 {
-  "version": "0.98.2",
-  "build": 35,
-  "title": "Bundle Firebase Android configuration"
+  "version": "0.98.3",
+  "build": 36,
+  "title": "Fix Android signing password compatibility"
 }

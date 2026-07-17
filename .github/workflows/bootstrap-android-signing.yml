@@ -32,7 +32,7 @@ jobs:
 
           KEY_ALIAS="movemate"
           KEYSTORE_PASSWORD="$(openssl rand -base64 36 | tr -d '\n=/+' | cut -c1-32)"
-          KEY_PASSWORD="$(openssl rand -base64 36 | tr -d '\n=/+' | cut -c1-32)"
+          KEY_PASSWORD="$KEYSTORE_PASSWORD"
 
           keytool -genkeypair \
             -keystore signing-output/movemate-release.jks \
@@ -42,6 +42,7 @@ jobs:
             -keyalg RSA \
             -keysize 2048 \
             -validity 10000 \
+            -storetype PKCS12 \
             -dname "CN=MoveMate, OU=Mobile, O=MoveMate, L=Jerusalem, ST=Jerusalem, C=IL"
 
           KEYSTORE_BASE64="$(base64 -w 0 signing-output/movemate-release.jks)"

@@ -1,3 +1,9 @@
+## 0.98.3+36
+
+- Fixed PKCS12 signing by using the keystore password for the private key.
+- Added a keytool validation step before the Android release build.
+- Updated the signing bootstrap to generate one consistent password.
+
 ## 0.98.2+35
 
 - Added the Firebase Android configuration file to the repository package.
