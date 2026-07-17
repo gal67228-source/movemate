@@ -1,3 +1,13 @@
+# Changelog
+
+## 0.98.4+37
+
+- Simplified the Google sign-in screen to the two primary actions.
+- Removed setup and Firebase explanatory cards from the initial screen.
+- Kept the new-move form focused and removed preview content.
+- Made the move name optional with a default of `מעבר דירה`.
+- Added a short success confirmation after creating a move.
+
 ## 0.98.3+36
 
 - Fixed PKCS12 signing by using the keystore password for the private key.

@@ -57,8 +57,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final session = ref.watch(authSessionProvider).value;
-
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -83,41 +81,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     .displaySmall
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 12),
-              Text(
-                'התחבר עם Google כדי לשייך את המעבר לחשבון שלך ולהכין אותו לסנכרון עתידי.',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              if (session?.firebaseConfigured == false) ...[
-                const SizedBox(height: 18),
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(14),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Icons.info_outline_rounded),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Google עדיין לא הוגדר בפרויקט Firebase. האפליקציה תמשיך לעבוד במצב מקומי.',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
                   onPressed: _working ? null : _signIn,
                   icon: const Icon(Icons.account_circle_outlined),
-                  label: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    child: Text('התחברות עם Google'),
+                  label: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: Text(_working ? 'מתחבר...' : 'התחבר עם Google'),
                   ),
                 ),
               ),

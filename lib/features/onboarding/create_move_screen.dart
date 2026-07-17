@@ -16,7 +16,7 @@ class CreateMoveScreen extends ConsumerStatefulWidget {
 
 class _CreateMoveScreenState extends ConsumerState<CreateMoveScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController(text: 'המעבר שלנו');
+  final _nameController = TextEditingController();
   final _fromController = TextEditingController();
   final _toController = TextEditingController();
   DateTime? _moveDate;
@@ -61,7 +61,9 @@ class _CreateMoveScreenState extends ConsumerState<CreateMoveScreen> {
     final session = await ref.read(authSessionProvider.future);
     final move = MovePlan(
       id: now.microsecondsSinceEpoch.toString(),
-      name: _nameController.text.trim(),
+      name: _nameController.text.trim().isEmpty
+          ? 'מעבר דירה'
+          : _nameController.text.trim(),
       fromAddress: _fromController.text.trim(),
       toAddress: _toController.text.trim(),
       moveDate: _moveDate!,
@@ -85,7 +87,33 @@ class _CreateMoveScreenState extends ConsumerState<CreateMoveScreen> {
     if (!mounted) {
       return;
     }
-    context.go('/dashboard');
+    Future<void>.delayed(const Duration(milliseconds: 900), () {
+      if (mounted && Navigator.of(context, rootNavigator: true).canPop()) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
+    });
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.check_circle_rounded, size: 56),
+            SizedBox(height: 16),
+            Text(
+              'המעבר נוצר בהצלחה!',
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (mounted) {
+      context.go('/dashboard');
+    }
   }
 
   @override
@@ -101,8 +129,8 @@ class _CreateMoveScreenState extends ConsumerState<CreateMoveScreen> {
             const SizedBox(height: 20),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'שם המעבר', prefixIcon: Icon(Icons.edit_rounded)),
-              validator: (value) => value == null || value.trim().isEmpty ? 'יש להזין שם' : null,
+              decoration: const InputDecoration(labelText: 'שם המעבר (אופציונלי)', prefixIcon: Icon(Icons.edit_rounded)),
+              textInputAction: TextInputAction.next,
             ),
             const SizedBox(height: 14),
             TextFormField(controller: _fromController, decoration: const InputDecoration(labelText: 'כתובת נוכחית', prefixIcon: Icon(Icons.home_outlined))),
