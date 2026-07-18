@@ -1,3 +1,9 @@
+## 0.99.2+41
+
+- Added Android system sharing for move invitation codes.
+- Invitations can now be sent through WhatsApp, email, messaging apps, and any installed share target.
+- Kept copy-to-clipboard as a separate quick action.
+
 ## 0.99.1+40
 
 - Fixed async BuildContext lint in the sharing screen.

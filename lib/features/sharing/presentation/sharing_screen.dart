@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/auth/auth_providers.dart';
 import '../../../core/storage/local_storage.dart';
@@ -24,6 +25,20 @@ class _SharingScreenState extends ConsumerState<SharingScreen> {
   void dispose() {
     _codeController.dispose();
     super.dispose();
+  }
+
+  Future<void> _shareInvite(ShareInvite invite) async {
+    final message = '''הזמנה ל-MoveMate
+
+הצטרפו למעבר המשותף באמצעות הקוד:
+${invite.code}
+
+הקוד תקף עד ${_formatDate(invite.expiresAt)}.''';
+
+    await Share.share(
+      message,
+      subject: 'הזמנה למעבר משותף ב-MoveMate',
+    );
   }
 
   Future<void> _createInvite(CloudSyncService service) async {
@@ -191,22 +206,37 @@ class _SharingScreenState extends ConsumerState<SharingScreen> {
                                         .headlineMedium
                                         ?.copyWith(letterSpacing: 3),
                                   ),
-                                  TextButton.icon(
-                                    onPressed: () async {
-                                      await Clipboard.setData(
-                                        ClipboardData(text: _invite!.code),
-                                      );
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text('הקוד הועתק'),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    icon: const Icon(Icons.copy_rounded),
-                                    label: const Text('העתקת הקוד'),
+                                  Wrap(
+                                    alignment: WrapAlignment.center,
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: [
+                                      TextButton.icon(
+                                        onPressed: () async {
+                                          await Clipboard.setData(
+                                            ClipboardData(
+                                              text: _invite!.code,
+                                            ),
+                                          );
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text('הקוד הועתק'),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        icon: const Icon(Icons.copy_rounded),
+                                        label: const Text('העתקת הקוד'),
+                                      ),
+                                      FilledButton.tonalIcon(
+                                        onPressed: () =>
+                                            _shareInvite(_invite!),
+                                        icon: const Icon(Icons.share_rounded),
+                                        label: const Text('שיתוף הזמנה'),
+                                      ),
+                                    ],
                                   ),
                                   Text(
                                     'הקוד תקף עד ${_formatDate(_invite!.expiresAt)}',

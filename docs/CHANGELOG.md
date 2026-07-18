@@ -1,3 +1,7 @@
+## 0.99.2+41
+
+- Added native system sharing for move invitations.
+
 ## 0.97.4+30
 
 - Downgraded flutter_riverpod to 2.6.1 for compatibility with Flutter test SDK pins and the Drift code-generation toolchain.
