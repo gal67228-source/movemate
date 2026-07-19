@@ -1,0 +1,28 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(moveId) {
+      return signedIn() &&
+        firestore.get(/databases/(default)/documents/moves/$(moveId)).data.ownerUid == request.auth.uid;
+    }
+
+    function isMember(moveId) {
+      return signedIn() &&
+        firestore.exists(/databases/(default)/documents/moves/$(moveId)/members/$(request.auth.uid));
+    }
+
+    function canAccess(moveId) {
+      return isOwner(moveId) || isMember(moveId);
+    }
+
+    match /moves/{moveId}/{allPaths=**} {
+      allow read: if canAccess(moveId);
+      allow write: if canAccess(moveId) &&
+        (request.resource == null || request.resource.size < 10 * 1024 * 1024);
+    }
+  }
+}

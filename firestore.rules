@@ -1,107 +1,57 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() {
       return request.auth != null;
     }
 
-    function tripDoc(tripId) {
-      return get(
-        /databases/$(database)/documents/trips/$(tripId)
-      );
+    function isOwner(moveId) {
+      return signedIn() &&
+        get(/databases/$(database)/documents/moves/$(moveId)).data.ownerUid == request.auth.uid;
     }
 
-    function isOwner(tripId) {
-      return signedIn()
-        && request.auth.uid
-          == tripDoc(tripId).data.ownerUserId;
+    function isMember(moveId) {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/moves/$(moveId)/members/$(request.auth.uid));
     }
 
-    function isMember(tripId) {
-      return signedIn()
-        && request.auth.uid
-          in tripDoc(tripId).data.memberIds;
+    function canAccess(moveId) {
+      return isOwner(moveId) || isMember(moveId);
     }
 
-    function isEditor(tripId) {
-      return signedIn()
-        && request.auth.uid
-          in tripDoc(tripId).data.editorIds;
+    match /users/{userId} {
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow create, update: if signedIn() && request.auth.uid == userId;
     }
 
-    match /trips/{tripId} {
-      allow create: if signedIn()
-        && request.resource.data.ownerUserId
-          == request.auth.uid;
+    match /moves/{moveId} {
+      allow create: if signedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow read: if canAccess(moveId);
+      allow update, delete: if isOwner(moveId);
 
-      allow read: if isMember(tripId);
-
-      allow update: if isOwner(tripId)
-        || (
-          isEditor(tripId)
-          && request.resource.data.ownerUserId
-            == resource.data.ownerUserId
-          && request.resource.data.memberIds
-            == resource.data.memberIds
-          && request.resource.data.editorIds
-            == resource.data.editorIds
-        )
-        || (
-          signedIn()
-          && request.auth.uid
-            in request.resource.data.memberIds
-          && !(request.auth.uid
-            in resource.data.memberIds)
-          && request.resource.data.ownerUserId
-            == resource.data.ownerUserId
-        );
-
-      allow delete: if isOwner(tripId);
+      match /state/{stateKey} {
+        allow read, write: if canAccess(moveId);
+      }
 
       match /members/{memberId} {
-        allow read: if isMember(tripId);
-        allow create, update, delete:
-          if isOwner(tripId)
-          || (
-            signedIn()
-            && memberId == request.auth.uid
-          );
-      }
-
-      match /activityFeed/{eventId} {
-        allow read: if isMember(tripId);
-        allow create: if isEditor(tripId);
-        allow update, delete: if false;
-      }
-
-      match /{collectionName}/{documentId} {
-        allow read: if isMember(tripId);
-        allow create, update, delete:
-          if isEditor(tripId);
+        allow read: if canAccess(moveId);
+        allow delete: if isOwner(moveId) || request.auth.uid == memberId;
+        allow create: if signedIn() && request.auth.uid == memberId &&
+          request.resource.data.uid == request.auth.uid &&
+          exists(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)) &&
+          get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.moveId == moveId &&
+          get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.active == true &&
+          get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.expiresAt > request.time;
+        allow update: if false;
       }
     }
 
-    match /tripInvites/{code} {
+    match /invites/{code} {
+      allow create: if signedIn() &&
+        request.resource.data.ownerUid == request.auth.uid &&
+        isOwner(request.resource.data.moveId);
       allow read: if signedIn();
-
-      allow create: if signedIn()
-        && request.resource.data.createdBy
-          == request.auth.uid;
-
-      allow update: if signedIn()
-        && (
-          resource.data.createdBy
-            == request.auth.uid
-          || request.resource.data.acceptedBy
-            == request.auth.uid
-          || request.resource.data.declinedBy
-            == request.auth.uid
-        );
-
-      allow delete: if signedIn()
-        && resource.data.createdBy
-          == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.ownerUid == request.auth.uid;
     }
   }
 }
