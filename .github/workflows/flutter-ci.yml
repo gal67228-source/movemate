@@ -21,6 +21,11 @@ jobs:
     name: Analyze, test and build Android
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      GRADLE_OPTS: >-
+        -Dorg.gradle.daemon=false
+        -Dorg.gradle.vfs.watch=false
+        -Dkotlin.compiler.execution.strategy=in-process
 
     steps:
       - name: Check out repository
@@ -48,6 +53,18 @@ jobs:
           --org com.movemate
           --project-name movemate
           --no-pub
+
+      - name: Stabilize Gradle and Kotlin for CI
+        run: |
+          cat >> android/gradle.properties <<'EOF'
+          org.gradle.daemon=false
+          org.gradle.parallel=false
+          org.gradle.vfs.watch=false
+          org.gradle.workers.max=2
+          kotlin.compiler.execution.strategy=in-process
+          kotlin.incremental=false
+          EOF
+          rm -rf android/.gradle
 
       - name: Configure Firebase Android
         run: |
@@ -86,6 +103,13 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Verify pinned FlutterFire versions
+        run: |
+          flutter pub deps --style=compact | tee /tmp/pub-deps.txt
+          grep -F 'firebase_core 3.13.0' /tmp/pub-deps.txt
+          grep -F 'firebase_auth 5.5.2' /tmp/pub-deps.txt
+          grep -F 'cloud_firestore 5.6.6' /tmp/pub-deps.txt
 
       # Format inside CI and continue. This prevents style-only differences
       # from blocking APK compilation when a ZIP was created on another system.

@@ -1,3 +1,11 @@
+## 0.99.6+45
+
+- Pinned FlutterFire to the official compatible set: firebase_core 3.13.0, firebase_auth 5.5.2, and cloud_firestore 5.6.6.
+- Avoided the Firebase Android SDK release compiled with Kotlin metadata 2.3.
+- Disabled Gradle file-system watching and background daemons in CI.
+- Forced Kotlin compilation in-process with limited workers for deterministic GitHub Actions builds.
+- Added a CI check that verifies the exact Firebase dependency versions before analysis and build.
+
 # Changelog
 
 ## 0.99.5

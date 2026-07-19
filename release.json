@@ -1,5 +1,5 @@
 {
-  "version": "0.99.5",
-  "build": 44,
-  "title": "Remove paid photo storage and keep QR"
+  "version": "0.99.6",
+  "build": 45,
+  "title": "Stabilize Firebase and Kotlin CI toolchain"
 }
