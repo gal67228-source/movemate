@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 
-import '../../../core/media/media_service.dart';
-import '../../../shared/widgets/media_thumbnail.dart';
 import '../../moves/data/move_repository.dart';
 import '../../sales/data/sale_repository.dart';
 import '../../sales/domain/sale_item.dart';
@@ -151,8 +148,6 @@ class RoomInventoryScreen extends ConsumerWidget {
     var destination = item.destination;
     var selectedBoxId = item.linkedBoxId;
     var quantity = item.quantity;
-    var imageUri = item.imageUri;
-    var uploadingImage = false;
     final notesController = TextEditingController(text: item.notes);
     final quantityController = TextEditingController(text: '$quantity');
     final salesRepository = await ref.read(saleRepositoryProvider.future);
@@ -179,77 +174,6 @@ class RoomInventoryScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    MediaThumbnail(uri: imageUri, size: 88),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          OutlinedButton.icon(
-                            onPressed: uploadingImage
-                                ? null
-                                : () async {
-                                    final source = await showModalBottomSheet<ImageSource>(
-                                      context: context,
-                                      builder: (sheetContext) => SafeArea(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            ListTile(
-                                              leading: const Icon(Icons.photo_camera_outlined),
-                                              title: const Text('צילום תמונה'),
-                                              onTap: () => Navigator.pop(sheetContext, ImageSource.camera),
-                                            ),
-                                            ListTile(
-                                              leading: const Icon(Icons.photo_library_outlined),
-                                              title: const Text('בחירה מהגלריה'),
-                                              onTap: () => Navigator.pop(sheetContext, ImageSource.gallery),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                    if (source == null) {
-                                      return;
-                                    }
-                                    setDialogState(() => uploadingImage = true);
-                                    final uri = await ref.read(mediaServiceProvider).pickAndStoreImage(
-                                          moveId: item.moveId,
-                                          entityType: 'items',
-                                          entityId: item.id,
-                                          source: source,
-                                        );
-                                    if (context.mounted) {
-                                      setDialogState(() {
-                                        uploadingImage = false;
-                                        if (uri != null) {
-                                          imageUri = uri;
-                                        }
-                                      });
-                                    }
-                                  },
-                            icon: uploadingImage
-                                ? const SizedBox.square(
-                                    dimension: 18,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : const Icon(Icons.add_a_photo_outlined),
-                            label: Text(imageUri == null ? 'הוספת תמונה' : 'החלפת תמונה'),
-                          ),
-                          if (imageUri != null)
-                            TextButton.icon(
-                              onPressed: () => setDialogState(() => imageUri = null),
-                              icon: const Icon(Icons.delete_outline),
-                              label: const Text('הסרת תמונה'),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: quantityController,
@@ -387,7 +311,6 @@ class RoomInventoryScreen extends ConsumerWidget {
       destination: destination,
       notes: notesController.text.trim(),
       quantity: quantity,
-      imageUri: imageUri,
       clearLinkedBox: destination != ItemDestination.moving,
     );
     if (destination != ItemDestination.moving && item.linkedBoxId != null) {
@@ -567,13 +490,11 @@ class RoomInventoryScreen extends ConsumerWidget {
                                       item,
                                       boxes,
                                     ),
-                                    leading: item.imageUri == null
-                                        ? Icon(
-                                            item.isLarge
-                                                ? Icons.chair_outlined
-                                                : Icons.inventory_2_outlined,
-                                          )
-                                        : MediaThumbnail(uri: item.imageUri, size: 48, borderRadius: 8),
+                                    leading: Icon(
+                                      item.isLarge
+                                          ? Icons.chair_outlined
+                                          : Icons.inventory_2_outlined,
+                                    ),
                                     title: Row(
                                       children: [
                                         Expanded(child: Text(item.name)),

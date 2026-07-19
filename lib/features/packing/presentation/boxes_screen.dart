@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../shared/widgets/media_thumbnail.dart';
 import '../data/packing_repository.dart';
 import '../domain/packing_models.dart';
 
@@ -148,13 +147,7 @@ class _BoxesScreenState extends ConsumerState<BoxesScreen> {
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      box.imageUri == null
-                                          ? CircleAvatar(child: Text('${box.number}'))
-                                          : MediaThumbnail(
-                                              uri: box.imageUri,
-                                              size: 52,
-                                              borderRadius: 26,
-                                            ),
+                                      CircleAvatar(child: Text('${box.number}')),
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Column(

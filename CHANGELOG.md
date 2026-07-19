@@ -1,3 +1,18 @@
+# Changelog
+
+## 0.99.5
+
+- Removed box and inventory photo capture and gallery selection.
+- Removed Firebase Storage and image picker dependencies.
+- Kept QR generation and scanning for boxes.
+- Removed Storage rules and Storage deployment configuration.
+- Preserved legacy image fields only for backward-compatible data loading.
+
+- Run Flutter CI on pushes to `main` only.
+- Run pull request CI only when targeting `main`.
+- Prevent duplicate/stale runs with a workflow-aware concurrency group.
+- Reduce Dependabot updates to monthly with one open PR per ecosystem.
+
 ## 0.99.3+42
 
 - Added stable QR codes for moving boxes.

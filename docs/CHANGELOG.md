@@ -1,3 +1,9 @@
+# MoveMate Changelog
+
+## 0.99.5
+- Removed photo features and Firebase Storage to keep operating costs at zero.
+- QR box labels and scanning remain available.
+
 ## 0.99.2+41
 
 - Added native system sharing for move invitations.

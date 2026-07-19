@@ -68,6 +68,6 @@ Version 0.95 focuses on consistent Material 3 styling, accessibility, upgrade sa
 
 MoveMate now supports a Google identity layer while remaining offline-first. Without Firebase configuration, the app continues to work in local mode. See `docs/FIREBASE_SETUP.md` for the one-time Firebase and GitHub Actions setup.
 
-## QR and photos
+## QR codes
 
-Version 0.99.3 adds QR generation/scanning for boxes and camera/gallery photos for boxes and room items. Cloud photo sharing requires Firebase Storage and the included `storage.rules`. See `docs/QR_AND_PHOTOS.md`.
+MoveMate supports QR generation and scanning for boxes. Photo storage is intentionally not included so the app can remain free to operate.

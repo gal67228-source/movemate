@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../../../core/media/media_service.dart';
-import '../../../shared/widgets/media_thumbnail.dart';
 import '../../moves/data/move_repository.dart';
 import '../data/packing_repository.dart';
 import '../domain/box_qr.dart';
@@ -33,8 +30,6 @@ class _BoxEditorScreenState extends ConsumerState<BoxEditorScreen> {
   MovingBox? _existingBox;
   bool _loaded = false;
   bool _saving = false;
-  bool _uploadingImage = false;
-  String? _imageUri;
 
   @override
   void dispose() {
@@ -66,7 +61,6 @@ class _BoxEditorScreenState extends ConsumerState<BoxEditorScreen> {
         _fragile = box.fragile;
         _weight = box.weight;
         _status = box.status;
-        _imageUri = box.imageUri;
       }
     }
   }
@@ -106,7 +100,6 @@ class _BoxEditorScreenState extends ConsumerState<BoxEditorScreen> {
       unpackedAt: _status == MovingBoxStatus.unpacked
           ? previous?.unpackedAt ?? now
           : null,
-      imageUri: _imageUri,
     );
     await repository.upsertBox(box);
     ref.invalidate(movingBoxesProvider);
@@ -118,57 +111,6 @@ class _BoxEditorScreenState extends ConsumerState<BoxEditorScreen> {
   }
 
 
-  Future<void> _pickImage(ImageSource source) async {
-    final move = await ref.read(currentMoveProvider.future);
-    if (move == null || !mounted) {
-      return;
-    }
-    setState(() => _uploadingImage = true);
-    try {
-      final entityId = _existingBox?.id ??
-          widget.boxId ??
-          'draft_${DateTime.now().microsecondsSinceEpoch}';
-      final uri = await ref.read(mediaServiceProvider).pickAndStoreImage(
-            moveId: move.id,
-            entityType: 'boxes',
-            entityId: entityId,
-            source: source,
-          );
-      if (uri != null && mounted) {
-        setState(() => _imageUri = uri);
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _uploadingImage = false);
-      }
-    }
-  }
-
-  Future<void> _chooseImageSource() async {
-    final source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_camera_outlined),
-              title: const Text('צילום תמונה'),
-              onTap: () => Navigator.pop(context, ImageSource.camera),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('בחירה מהגלריה'),
-              onTap: () => Navigator.pop(context, ImageSource.gallery),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (source != null) {
-      await _pickImage(source);
-    }
-  }
 
   int _nextBoxNumber(List<MovingBox> boxes) {
     if (boxes.isEmpty) {
@@ -200,36 +142,6 @@ class _BoxEditorScreenState extends ConsumerState<BoxEditorScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      MediaThumbnail(uri: _imageUri, size: 96),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            OutlinedButton.icon(
-                              onPressed: _uploadingImage ? null : _chooseImageSource,
-                              icon: _uploadingImage
-                                  ? const SizedBox.square(
-                                      dimension: 18,
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  : const Icon(Icons.add_a_photo_outlined),
-                              label: Text(_imageUri == null ? 'הוספת תמונה' : 'החלפת תמונה'),
-                            ),
-                            if (_imageUri != null)
-                              TextButton.icon(
-                                onPressed: () => setState(() => _imageUri = null),
-                                icon: const Icon(Icons.delete_outline),
-                                label: const Text('הסרת תמונה'),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
                   if (_existingBox != null) ...[
                     const SizedBox(height: 16),
                     Card(

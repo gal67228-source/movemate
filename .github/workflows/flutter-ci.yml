@@ -2,15 +2,18 @@ name: Flutter CI
 
 on:
   push:
-    branches: ['**']
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: flutter-ci-${{ github.ref }}
+  group: flutter-ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
