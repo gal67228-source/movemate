@@ -1,3 +1,11 @@
+## 0.99.7+46
+
+- Added a Smart Move readiness score based on tasks, packing, boxes, shopping, and sales.
+- Added a move timeline showing the next open tasks.
+- Added a room-grouped list of items that are still not packed.
+- Added one-tap completion of missing recommended tasks based on the move date.
+- Added readiness insights and countdown access from the dashboard.
+
 ## 0.99.6+45
 
 - Pinned FlutterFire to the official compatible set: firebase_core 3.13.0, firebase_auth 5.5.2, and cloud_firestore 5.6.6.

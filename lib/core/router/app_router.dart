@@ -19,6 +19,7 @@ import '../../features/settings/presentation/about_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/sharing/presentation/sharing_screen.dart';
 import '../../features/shopping/presentation/shopping_screen.dart';
+import '../../features/smart_move/presentation/smart_move_screen.dart';
 import '../../features/tasks/presentation/task_editor_screen.dart';
 import '../../features/tasks/tasks_screen.dart';
 
@@ -37,6 +38,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(path: '/tasks', builder: (context, state) => const TasksScreen()),
+      GoRoute(
+        path: '/smart-move',
+        builder: (context, state) => const SmartMoveScreen(),
+      ),
       GoRoute(
         path: '/moving-day',
         builder: (context, state) => const MovingDayScreen(),

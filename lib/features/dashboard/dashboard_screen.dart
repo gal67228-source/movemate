@@ -11,6 +11,7 @@ import '../sales/data/sale_repository.dart';
 import '../sales/domain/sale_item.dart';
 import '../shopping/data/shopping_repository.dart';
 import '../tasks/data/task_repository.dart';
+import '../smart_move/data/smart_move_provider.dart';
 import '../../shared/widgets/stat_card.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -25,7 +26,9 @@ class DashboardScreen extends ConsumerWidget {
     final shoppingStatsAsync = ref.watch(shoppingStatsProvider);
     final budgetStatsAsync = ref.watch(budgetStatsProvider);
     final movingDayStatsAsync = ref.watch(movingDayStatsProvider);
+    final smartMoveAsync = ref.watch(smartMoveSummaryProvider);
     final actions = <({String title, IconData icon, String? route})>[
+      (title: 'תוכנית מעבר', icon: Icons.auto_awesome_rounded, route: '/smart-move'),
       (title: 'יום המעבר', icon: Icons.local_shipping_rounded, route: '/moving-day'),
       (title: 'חיפוש', icon: Icons.search_rounded, route: '/search'),
       (title: 'משימות', icon: Icons.checklist_rounded, route: '/tasks'),
@@ -87,6 +90,7 @@ class DashboardScreen extends ConsumerWidget {
           ref.invalidate(budgetStatsProvider);
           ref.invalidate(movingDayItemsProvider);
           ref.invalidate(movingDayStatsProvider);
+          ref.invalidate(smartMoveSummaryProvider);
           await ref.read(taskStatsProvider.future);
         },
         child: ListView(
@@ -111,6 +115,54 @@ class DashboardScreen extends ConsumerWidget {
               error: (error, stackTrace) => Text('שגיאה: $error'),
             ),
             const SizedBox(height: 18),
+            smartMoveAsync.when(
+              data: (summary) => Card(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  onTap: () => context.push('/smart-move'),
+                  child: Padding(
+                    padding: const EdgeInsets.all(18),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 58,
+                          height: 58,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CircularProgressIndicator(value: summary.readiness),
+                              Text('${summary.readinessPercent}%'),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'מוכנות למעבר',
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                summary.remainingItems == 0
+                                    ? 'כל הציוד שנבחר כבר נארז'
+                                    : '${summary.remainingItems} פריטים עדיין לא נארזו',
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_left_rounded),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (error, stackTrace) => const SizedBox.shrink(),
+            ),
+            const SizedBox(height: 16),
             movingDayStatsAsync.when(
               data: (stats) => Card(
                 child: InkWell(

@@ -33,7 +33,7 @@ class AboutScreen extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'גרסה 0.98.0 (33)',
+            'גרסה 0.99.7 (46)',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
