@@ -44,46 +44,30 @@ class TaskRepository {
     await _storage.writeObjectList(_tasksKey, all.map((item) => item.toJson()).toList());
   }
 
-  static const recommendedTemplates = <({String title, int daysBefore, TaskCategory category, TaskPriority priority})>[
-    (title: 'להזמין חברת הובלה', daysBefore: 30, category: TaskCategory.moving, priority: TaskPriority.high),
-    (title: 'להתחיל למיין ציוד', daysBefore: 21, category: TaskCategory.packing, priority: TaskPriority.medium),
-    (title: 'לקנות חומרי אריזה', daysBefore: 14, category: TaskCategory.shopping, priority: TaskPriority.high),
-    (title: 'לעדכן כתובת בשירותים', daysBefore: 7, category: TaskCategory.bureaucracy, priority: TaskPriority.high),
-    (title: 'לארוז תיק ליום המעבר', daysBefore: 3, category: TaskCategory.packing, priority: TaskPriority.high),
-    (title: 'להפשיר את המקפיא', daysBefore: 1, category: TaskCategory.packing, priority: TaskPriority.medium),
-    (title: 'לבדוק שכל הארגזים הועמסו', daysBefore: 0, category: TaskCategory.moving, priority: TaskPriority.high),
-    (title: 'לצלם קריאות מוני מים וחשמל', daysBefore: 0, category: TaskCategory.bureaucracy, priority: TaskPriority.high),
-  ];
-
   Future<void> seedDefaults({required String moveId, required DateTime moveDate}) async {
     if (getTasks(moveId).isNotEmpty) {
       return;
     }
-    await addMissingRecommendations(moveId: moveId, moveDate: moveDate);
-  }
-
-  Future<int> addMissingRecommendations({
-    required String moveId,
-    required DateTime moveDate,
-  }) async {
-    final existingTitles = getTasks(moveId).map((task) => task.title.trim()).toSet();
     final now = DateTime.now();
-    var added = 0;
-    for (var index = 0; index < recommendedTemplates.length; index++) {
-      final template = recommendedTemplates[index];
-      if (existingTitles.contains(template.title)) {
-        continue;
-      }
+    final templates = <({String title, int daysBefore, TaskCategory category, TaskPriority priority})>[
+      (title: 'להזמין חברת הובלה', daysBefore: 30, category: TaskCategory.moving, priority: TaskPriority.high),
+      (title: 'להתחיל למיין ציוד', daysBefore: 21, category: TaskCategory.packing, priority: TaskPriority.medium),
+      (title: 'לקנות חומרי אריזה', daysBefore: 14, category: TaskCategory.shopping, priority: TaskPriority.high),
+      (title: 'לעדכן כתובת בשירותים', daysBefore: 7, category: TaskCategory.bureaucracy, priority: TaskPriority.high),
+      (title: 'לארוז תיק ליום המעבר', daysBefore: 3, category: TaskCategory.packing, priority: TaskPriority.high),
+      (title: 'להפשיר את המקפיא', daysBefore: 1, category: TaskCategory.packing, priority: TaskPriority.medium),
+      (title: 'לבדוק שכל הארגזים הועמסו', daysBefore: 0, category: TaskCategory.moving, priority: TaskPriority.high),
+    ];
+    for (var index = 0; index < templates.length; index++) {
+      final template = templates[index];
       final planned = moveDate.subtract(Duration(days: template.daysBefore));
-      final dueDate = planned.isBefore(now)
-          ? DateTime(now.year, now.month, now.day)
-          : planned;
+      final dueDate = planned.isBefore(now) ? DateTime(now.year, now.month, now.day) : planned;
       await upsert(
         MoveTask(
-          id: 'recommended_${moveId}_${template.title.hashCode.abs()}',
+          id: 'default_${moveId}_$index',
           moveId: moveId,
           title: template.title,
-          description: 'משימה מומלצת שנוצרה לפי תאריך המעבר.',
+          description: 'משימה שנוצרה אוטומטית לפי תאריך המעבר.',
           dueDate: dueDate,
           priority: template.priority,
           category: template.category,
@@ -91,9 +75,7 @@ class TaskRepository {
           createdAt: now,
         ),
       );
-      added++;
     }
-    return added;
   }
 }
 

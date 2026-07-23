@@ -1,18 +1,15 @@
-## 0.99.7+46
+# 0.99.9+46
 
-- Added a Smart Move readiness score based on tasks, packing, boxes, shopping, and sales.
-- Added a move timeline showing the next open tasks.
-- Added a room-grouped list of items that are still not packed.
-- Added one-tap completion of missing recommended tasks based on the move date.
-- Added readiness insights and countdown access from the dashboard.
+- נוספו הרשאות Owner/Editor/Viewer לשיתוף.
+- נוספו ייצוא וייבוא גיבוי JSON.
+- נוסף Dashboard חכם עם תובנות.
+- נוספו בדיקות Release והרשאות Firestore מעודכנות.
 
 ## 0.99.6+45
 
-- Pinned FlutterFire to the official compatible set: firebase_core 3.13.0, firebase_auth 5.5.2, and cloud_firestore 5.6.6.
-- Avoided the Firebase Android SDK release compiled with Kotlin metadata 2.3.
-- Disabled Gradle file-system watching and background daemons in CI.
-- Forced Kotlin compilation in-process with limited workers for deterministic GitHub Actions builds.
-- Added a CI check that verifies the exact Firebase dependency versions before analysis and build.
+- Restored `.github/workflows/build-apk.yml` as a valid manual-only compatibility workflow.
+- Prevented the legacy workflow from triggering duplicate automatic builds.
+- Kept `Flutter CI` as the only automatic Android build workflow.
 
 # Changelog
 

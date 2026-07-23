@@ -1,0 +1,21 @@
+name: Legacy APK Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: legacy-apk-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  redirect:
+    name: Use Flutter CI workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain workflow status
+        run: |
+          echo "This legacy workflow is kept only for repository compatibility."
+          echo "Use the Flutter CI workflow for automatic analyze, test, and APK builds."

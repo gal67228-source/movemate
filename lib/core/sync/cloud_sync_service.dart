@@ -47,16 +47,27 @@ class SyncStatus {
   }
 }
 
+enum SharedRole { editor, viewer }
+
+extension SharedRoleLabel on SharedRole {
+  String get label => switch (this) {
+        SharedRole.editor => 'עורך',
+        SharedRole.viewer => 'צופה',
+      };
+}
+
 class ShareInvite {
   const ShareInvite({
     required this.code,
     required this.moveId,
     required this.expiresAt,
+    required this.role,
   });
 
   final String code;
   final String moveId;
   final DateTime expiresAt;
+  final SharedRole role;
 }
 
 class SharedMember {
@@ -65,12 +76,14 @@ class SharedMember {
     required this.displayName,
     required this.email,
     required this.joinedAt,
+    required this.role,
   });
 
   final String uid;
   final String displayName;
   final String email;
   final DateTime joinedAt;
+  final SharedRole role;
 }
 
 class CloudSyncService {
@@ -101,7 +114,9 @@ class CloudSyncService {
     pendingWrites: 0,
   );
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? _subscription;
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? _memberSubscription;
   String? _moveId;
+  SharedRole? _memberRole;
   bool _applyingRemote = false;
 
   Stream<SyncStatus> get statusChanges => _statusController.stream;
@@ -109,6 +124,8 @@ class CloudSyncService {
   SyncStatus get status => _status;
 
   String? get moveId => _moveId;
+
+  bool get canWrite => _memberRole != SharedRole.viewer;
 
   Future<void> initialize(Map<String, StorageRecord> localRecords) async {
     try {
@@ -124,12 +141,28 @@ class CloudSyncService {
         return;
       }
       _moveId = moveId;
+      _memberRole = ownerUid == _user.uid
+          ? SharedRole.editor
+          : await _loadMemberRole(moveId);
       await _ensureMoveDocument(moveJson);
       await synchronize(localRecords);
       _listenForRemoteChanges();
+      _listenForRoleChanges(ownerUid);
     } catch (error) {
       _setStatus(_status.copyWith(error: '$error'));
     }
+  }
+
+  Future<SharedRole> _loadMemberRole(String moveId) async {
+    final member = await _firestore
+        .collection('moves')
+        .doc(moveId)
+        .collection('members')
+        .doc(_user.uid)
+        .get();
+    return member.data()?['role'] == 'viewer'
+        ? SharedRole.viewer
+        : SharedRole.editor;
   }
 
   Future<void> _saveUserProfile() {
@@ -218,6 +251,9 @@ class CloudSyncService {
   }
 
   Future<void> push(String key, String value, DateTime updatedAt) async {
+    if (!canWrite) {
+      throw StateError('למשתמש יש הרשאת צפייה בלבד.');
+    }
     if (_applyingRemote) {
       return;
     }
@@ -259,6 +295,25 @@ class CloudSyncService {
       await synchronize(await _database.readAllRecords());
       _listenForRemoteChanges();
     }
+  }
+
+  void _listenForRoleChanges(String ownerUid) {
+    _memberSubscription?.cancel();
+    if (ownerUid == _user.uid || _moveId == null) {
+      _memberRole = SharedRole.editor;
+      return;
+    }
+    _memberSubscription = _firestore
+        .collection('moves')
+        .doc(_moveId)
+        .collection('members')
+        .doc(_user.uid)
+        .snapshots()
+        .listen((snapshot) {
+      _memberRole = snapshot.data()?['role'] == 'viewer'
+          ? SharedRole.viewer
+          : SharedRole.editor;
+    });
   }
 
   void _listenForRemoteChanges() {
@@ -307,7 +362,7 @@ class CloudSyncService {
         .doc(key);
   }
 
-  Future<ShareInvite> createInvite() async {
+  Future<ShareInvite> createInvite({SharedRole role = SharedRole.editor}) async {
     final moveId = _moveId;
     if (moveId == null) {
       throw StateError('לא נמצא מעבר מסונכרן.');
@@ -320,8 +375,9 @@ class CloudSyncService {
       'active': true,
       'createdAt': FieldValue.serverTimestamp(),
       'expiresAt': Timestamp.fromDate(expiresAt),
+      'role': role.name,
     });
-    return ShareInvite(code: code, moveId: moveId, expiresAt: expiresAt);
+    return ShareInvite(code: code, moveId: moveId, expiresAt: expiresAt, role: role);
   }
 
   Future<void> acceptInvite(String rawCode) async {
@@ -338,6 +394,7 @@ class CloudSyncService {
       throw StateError('קוד ההזמנה אינו פעיל או שפג תוקפו.');
     }
     final moveId = data['moveId'] as String;
+    final role = data['role'] == 'viewer' ? SharedRole.viewer : SharedRole.editor;
     await _firestore
         .collection('moves')
         .doc(moveId)
@@ -349,9 +406,11 @@ class CloudSyncService {
       'email': _user.email,
       'joinedAt': FieldValue.serverTimestamp(),
       'inviteCode': code,
-      'role': 'editor',
+      'role': role.name,
     });
     _moveId = moveId;
+    _memberRole = role;
+    _listenForRoleChanges(data['ownerUid'] as String? ?? '');
     final state = await _firestore
         .collection('moves')
         .doc(moveId)
@@ -392,8 +451,24 @@ class CloudSyncService {
                 email: data['email'] as String? ?? '',
                 joinedAt: (data['joinedAt'] as Timestamp?)?.toDate() ??
                     DateTime.now(),
+                role: data['role'] == 'viewer'
+                    ? SharedRole.viewer
+                    : SharedRole.editor,
               );
             }).toList());
+  }
+
+  Future<void> updateMemberRole(String uid, SharedRole role) async {
+    final moveId = _moveId;
+    if (moveId == null) {
+      return;
+    }
+    await _firestore
+        .collection('moves')
+        .doc(moveId)
+        .collection('members')
+        .doc(uid)
+        .update({'role': role.name});
   }
 
   Future<void> removeMember(String uid) async {
@@ -411,6 +486,7 @@ class CloudSyncService {
 
   Future<void> dispose() async {
     await _subscription?.cancel();
+    await _memberSubscription?.cancel();
     await _statusController.close();
   }
 

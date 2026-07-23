@@ -66,6 +66,9 @@ class LocalStorage {
   String? readString(String key) => _cache[key];
 
   Future<void> writeString(String key, String value) async {
+    if (_cloudSync?.canWrite == false) {
+      throw StateError('אין הרשאת עריכה למעבר הזה.');
+    }
     final updatedAt = DateTime.now();
     _cache[key] = value;
     _updatedAt[key] = updatedAt;

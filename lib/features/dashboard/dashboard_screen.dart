@@ -11,7 +11,6 @@ import '../sales/data/sale_repository.dart';
 import '../sales/domain/sale_item.dart';
 import '../shopping/data/shopping_repository.dart';
 import '../tasks/data/task_repository.dart';
-import '../smart_move/data/smart_move_provider.dart';
 import '../../shared/widgets/stat_card.dart';
 
 class DashboardScreen extends ConsumerWidget {
@@ -26,9 +25,10 @@ class DashboardScreen extends ConsumerWidget {
     final shoppingStatsAsync = ref.watch(shoppingStatsProvider);
     final budgetStatsAsync = ref.watch(budgetStatsProvider);
     final movingDayStatsAsync = ref.watch(movingDayStatsProvider);
-    final smartMoveAsync = ref.watch(smartMoveSummaryProvider);
+    final tasks = ref.watch(tasksProvider).asData?.value ?? const [];
+    final packingItems = ref.watch(packingItemsProvider).asData?.value ?? const [];
+    final saleItems = ref.watch(saleItemsProvider).asData?.value ?? const [];
     final actions = <({String title, IconData icon, String? route})>[
-      (title: 'תוכנית מעבר', icon: Icons.auto_awesome_rounded, route: '/smart-move'),
       (title: 'יום המעבר', icon: Icons.local_shipping_rounded, route: '/moving-day'),
       (title: 'חיפוש', icon: Icons.search_rounded, route: '/search'),
       (title: 'משימות', icon: Icons.checklist_rounded, route: '/tasks'),
@@ -90,7 +90,6 @@ class DashboardScreen extends ConsumerWidget {
           ref.invalidate(budgetStatsProvider);
           ref.invalidate(movingDayItemsProvider);
           ref.invalidate(movingDayStatsProvider);
-          ref.invalidate(smartMoveSummaryProvider);
           await ref.read(taskStatsProvider.future);
         },
         child: ListView(
@@ -115,54 +114,6 @@ class DashboardScreen extends ConsumerWidget {
               error: (error, stackTrace) => Text('שגיאה: $error'),
             ),
             const SizedBox(height: 18),
-            smartMoveAsync.when(
-              data: (summary) => Card(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(18),
-                  onTap: () => context.push('/smart-move'),
-                  child: Padding(
-                    padding: const EdgeInsets.all(18),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 58,
-                          height: 58,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              CircularProgressIndicator(value: summary.readiness),
-                              Text('${summary.readinessPercent}%'),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'מוכנות למעבר',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                summary.remainingItems == 0
-                                    ? 'כל הציוד שנבחר כבר נארז'
-                                    : '${summary.remainingItems} פריטים עדיין לא נארזו',
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Icon(Icons.chevron_left_rounded),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              loading: () => const SizedBox.shrink(),
-              error: (error, stackTrace) => const SizedBox.shrink(),
-            ),
-            const SizedBox(height: 16),
             movingDayStatsAsync.when(
               data: (stats) => Card(
                 child: InkWell(
@@ -364,6 +315,25 @@ class DashboardScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 18),
+            _SmartInsightsCard(
+              overdueTasks: tasks.where((task) {
+                final dueDate = task.dueDate;
+                return !task.isCompleted &&
+                    dueDate != null &&
+                    dueDate.isBefore(DateTime.now());
+              }).length,
+              unboxedItems: packingItems.where((item) {
+                return item.destination.name == 'moving' &&
+                    item.linkedBoxId == null &&
+                    item.status.name == 'atHome';
+              }).length,
+              saleWithoutPrice: saleItems.where((item) {
+                return item.askingPriceShekels <= 0 &&
+                    item.status.name != 'sold' &&
+                    item.status.name != 'cancelled';
+              }).length,
+            ),
+            const SizedBox(height: 18),
             Text('גישה מהירה', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 10),
             GridView.builder(
@@ -382,6 +352,50 @@ class DashboardScreen extends ConsumerWidget {
                 );
               },
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class _SmartInsightsCard extends StatelessWidget {
+  const _SmartInsightsCard({
+    required this.overdueTasks,
+    required this.unboxedItems,
+    required this.saleWithoutPrice,
+  });
+
+  final int overdueTasks;
+  final int unboxedItems;
+  final int saleWithoutPrice;
+
+  @override
+  Widget build(BuildContext context) {
+    final insights = <String>[];
+    if (overdueTasks > 0) insights.add('$overdueTasks משימות באיחור');
+    if (unboxedItems > 0) insights.add('$unboxedItems פריטים עדיין ללא ארגז');
+    if (saleWithoutPrice > 0) insights.add('$saleWithoutPrice פריטים למכירה ללא מחיר');
+    if (insights.isEmpty) insights.add('הכול נראה מסודר. המשיכו כך!');
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.auto_awesome_rounded),
+                const SizedBox(width: 8),
+                Text('תובנות למעבר', style: Theme.of(context).textTheme.titleMedium),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ...insights.map((text) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text('• $text'),
+                )),
           ],
         ),
       ),

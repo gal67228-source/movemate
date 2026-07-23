@@ -15,8 +15,16 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/moves/$(moveId)/members/$(request.auth.uid));
     }
 
+    function memberRole(moveId) {
+      return get(/databases/$(database)/documents/moves/$(moveId)/members/$(request.auth.uid)).data.role;
+    }
+
     function canAccess(moveId) {
       return isOwner(moveId) || isMember(moveId);
+    }
+
+    function canWrite(moveId) {
+      return isOwner(moveId) || (isMember(moveId) && memberRole(moveId) == 'editor');
     }
 
     match /users/{userId} {
@@ -30,7 +38,8 @@ service cloud.firestore {
       allow update, delete: if isOwner(moveId);
 
       match /state/{stateKey} {
-        allow read, write: if canAccess(moveId);
+        allow read: if canAccess(moveId);
+        allow write: if canWrite(moveId);
       }
 
       match /members/{memberId} {
@@ -41,8 +50,9 @@ service cloud.firestore {
           exists(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)) &&
           get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.moveId == moveId &&
           get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.active == true &&
-          get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.expiresAt > request.time;
-        allow update: if false;
+          get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.expiresAt > request.time &&
+          request.resource.data.role == get(/databases/$(database)/documents/invites/$(request.resource.data.inviteCode)).data.role;
+        allow update: if isOwner(moveId);
       }
     }
 

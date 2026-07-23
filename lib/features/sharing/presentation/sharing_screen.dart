@@ -19,6 +19,7 @@ class SharingScreen extends ConsumerStatefulWidget {
 class _SharingScreenState extends ConsumerState<SharingScreen> {
   final _codeController = TextEditingController();
   ShareInvite? _invite;
+  SharedRole _inviteRole = SharedRole.editor;
   bool _working = false;
 
   @override
@@ -33,6 +34,7 @@ class _SharingScreenState extends ConsumerState<SharingScreen> {
 הצטרפו למעבר המשותף באמצעות הקוד:
 ${invite.code}
 
+הרשאה: ${invite.role.label}
 הקוד תקף עד ${_formatDate(invite.expiresAt)}.''';
 
     await Share.share(
@@ -44,7 +46,7 @@ ${invite.code}
   Future<void> _createInvite(CloudSyncService service) async {
     setState(() => _working = true);
     try {
-      final invite = await service.createInvite();
+      final invite = await service.createInvite(role: _inviteRole);
       if (mounted) {
         setState(() => _invite = invite);
       }
@@ -189,6 +191,25 @@ ${invite.code}
                                   'צור קוד הזמנה ושלח אותו לאדם שברצונך לצרף.',
                                 ),
                                 const SizedBox(height: 14),
+                                DropdownButtonFormField<SharedRole>(
+                                  value: _inviteRole,
+                                  decoration: const InputDecoration(
+                                    labelText: 'הרשאה למוזמן',
+                                    prefixIcon: Icon(Icons.admin_panel_settings_outlined),
+                                  ),
+                                  items: SharedRole.values
+                                      .map((role) => DropdownMenuItem(
+                                            value: role,
+                                            child: Text(role.label),
+                                          ))
+                                      .toList(),
+                                  onChanged: _working
+                                      ? null
+                                      : (role) => setState(() {
+                                            _inviteRole = role ?? SharedRole.editor;
+                                          }),
+                                ),
+                                const SizedBox(height: 12),
                                 FilledButton.icon(
                                   onPressed: _working
                                       ? null
@@ -274,14 +295,39 @@ ${invite.code}
                                           child: Icon(Icons.person_rounded),
                                         ),
                                         title: Text(member.displayName),
-                                        subtitle: Text(member.email),
-                                        trailing: IconButton(
-                                          tooltip: 'הסרה',
-                                          onPressed: () =>
-                                              _removeMember(service, member),
-                                          icon: const Icon(
-                                            Icons.person_remove_outlined,
-                                          ),
+                                        subtitle: Text('${member.email} · ${member.role.label}'),
+                                        trailing: PopupMenuButton<String>(
+                                          tooltip: 'ניהול משתמש',
+                                          onSelected: (value) async {
+                                            if (value == 'remove') {
+                                              await _removeMember(service, member);
+                                            } else {
+                                              await service.updateMemberRole(
+                                                member.uid,
+                                                value == 'viewer'
+                                                    ? SharedRole.viewer
+                                                    : SharedRole.editor,
+                                              );
+                                            }
+                                          },
+                                          itemBuilder: (context) => [
+                                            CheckedPopupMenuItem(
+                                              value: 'editor',
+                                              checked: member.role == SharedRole.editor,
+                                              child: const Text('עורך'),
+                                            ),
+                                            CheckedPopupMenuItem(
+                                              value: 'viewer',
+                                              checked: member.role == SharedRole.viewer,
+                                              child: const Text('צופה'),
+                                            ),
+                                            const PopupMenuDivider(),
+                                            const PopupMenuItem(
+                                              value: 'remove',
+                                              child: Text('הסרת משתמש'),
+                                            ),
+                                          ],
+                                          icon: const Icon(Icons.more_vert_rounded),
                                         ),
                                       ),
                                     ),
