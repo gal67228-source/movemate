@@ -16,7 +16,7 @@ dependencies:
   intl: ^0.20.2
   shared_preferences: ^2.5.3
   drift: 2.26.1
-  drift_flutter: 0.2.4
+  drift_flutter: 0.2.7
   firebase_core: 3.15.2
   firebase_auth: 5.7.0
   cloud_firestore: 5.6.12
