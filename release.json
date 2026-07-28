@@ -1,5 +1,5 @@
 {
-  "version": "0.99.11",
-  "build": 48,
-  "title": "Android API 36 build compatibility"
+  "version": "0.99.12",
+  "build": 49,
+  "title": "Restore CI and Android API 36 workflow"
 }

@@ -1,3 +1,10 @@
+## 0.99.12+49
+
+- Restored the complete `.github` directory after it was omitted from the previous ZIP.
+- Restored automatic Flutter CI on pushes and pull requests to `main`.
+- CI installs Android SDK 36 and configures `compileSdk = 36` before building.
+- Kept the legacy APK workflow manual-only to avoid duplicate runs.
+
 ## 0.99.11+48
 
 - Upgraded `file_picker` for Android API 36 compatibility.

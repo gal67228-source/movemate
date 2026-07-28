@@ -1,0 +1,92 @@
+name: Bootstrap Android Signing
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate-signing-bundle:
+    name: Generate permanent Android signing bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Generate keystore and fingerprints
+        id: signing
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p signing-output
+
+          KEY_ALIAS="movemate"
+          KEYSTORE_PASSWORD="$(openssl rand -base64 36 | tr -d '\n=/+' | cut -c1-32)"
+          KEY_PASSWORD="$KEYSTORE_PASSWORD"
+
+          keytool -genkeypair \
+            -keystore signing-output/movemate-release.jks \
+            -storepass "$KEYSTORE_PASSWORD" \
+            -keypass "$KEY_PASSWORD" \
+            -alias "$KEY_ALIAS" \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storetype PKCS12 \
+            -dname "CN=MoveMate, OU=Mobile, O=MoveMate, L=Jerusalem, ST=Jerusalem, C=IL"
+
+          KEYSTORE_BASE64="$(base64 -w 0 signing-output/movemate-release.jks)"
+          SHA1="$(keytool -list -v -keystore signing-output/movemate-release.jks -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" | sed -n 's/^[[:space:]]*SHA1: //p')"
+          SHA256="$(keytool -list -v -keystore signing-output/movemate-release.jks -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" | sed -n 's/^[[:space:]]*SHA256: //p')"
+
+          cat > signing-output/signing-secrets.txt <<EOF
+          ANDROID_KEYSTORE_BASE64=$KEYSTORE_BASE64
+          ANDROID_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD
+          ANDROID_KEY_ALIAS=$KEY_ALIAS
+          ANDROID_KEY_PASSWORD=$KEY_PASSWORD
+          SHA1=$SHA1
+          SHA256=$SHA256
+          EOF
+
+          cat > signing-output/README.txt <<'EOF'
+          MoveMate Android signing bootstrap
+
+          IMPORTANT:
+          1. Download this artifact immediately.
+          2. Keep movemate-release.jks and signing-secrets.txt private.
+          3. Add the four ANDROID_* values as GitHub Actions repository secrets.
+          4. Add SHA1 and SHA256 to the MoveMate Android app in Firebase.
+          5. Download a fresh google-services.json after adding the fingerprints.
+          6. Delete this workflow artifact after completing setup.
+
+          Never commit the JKS or signing-secrets.txt to Git.
+          Losing this key may prevent future updates to the installed app.
+          EOF
+
+          {
+            echo "## MoveMate signing fingerprints"
+            echo ""
+            echo "SHA-1: \`$SHA1\`"
+            echo ""
+            echo "SHA-256: \`$SHA256\`"
+            echo ""
+            echo "Download the **movemate-signing-bootstrap** artifact and store it safely."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload private signing bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: movemate-signing-bootstrap
+          path: signing-output/
+          if-no-files-found: error
+          retention-days: 1
