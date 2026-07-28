@@ -1,5 +1,5 @@
 {
-  "version": "0.99.12",
-  "build": 49,
-  "title": "Restore CI and Android API 36 workflow"
+  "version": "0.99.13",
+  "build": 50,
+  "title": "Fix Android sdkmanager path in CI"
 }

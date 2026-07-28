@@ -1,3 +1,8 @@
+## 0.99.13+50
+
+- Fix Android SDK 36 installation in GitHub Actions by resolving the full sdkmanager path.
+- Add a clear diagnostic error when Android command-line tools are missing.
+
 ## 0.99.12+49
 
 - Restored the complete `.github` directory after it was omitted from the previous ZIP.
