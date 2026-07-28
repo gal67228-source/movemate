@@ -124,12 +124,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _exportBackup() async {
     try {
       final result = await ref.read(backupServiceProvider).exportBackup();
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('יוצא גיבוי של ${result.recordCount} רשומות')),
       );
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('ייצוא הגיבוי נכשל: $error')),
       );
@@ -148,18 +152,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ],
       ),
     );
-    if (confirmed != true) return;
+    if (confirmed != true) {
+      return;
+    }
     try {
       final result = await ref.read(backupServiceProvider).importBackup();
-      if (result == null) return;
+      if (result == null) {
+        return;
+      }
       ref.read(storageRevisionProvider.notifier).state++;
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('שוחזרו ${result.recordCount} רשומות')),
       );
       context.go('/dashboard');
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('שחזור הגיבוי נכשל: $error')),
       );
@@ -396,51 +408,6 @@ class _ThemeOptionTile extends StatelessWidget {
   final ThemeMode value;
   final bool selected;
   final ValueChanged<ThemeMode> onTap;
-
-  Future<void> _exportBackup() async {
-    try {
-      final result = await ref.read(backupServiceProvider).exportBackup();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('יוצא גיבוי של ${result.recordCount} רשומות')),
-      );
-    } catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ייצוא הגיבוי נכשל: $error')),
-      );
-    }
-  }
-
-  Future<void> _importBackup() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('שחזור גיבוי'),
-        content: const Text('השחזור יחליף את הנתונים המקומיים הנוכחיים.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('ביטול')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('בחירת קובץ')),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-    try {
-      final result = await ref.read(backupServiceProvider).importBackup();
-      if (result == null) return;
-      ref.read(storageRevisionProvider.notifier).state++;
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('שוחזרו ${result.recordCount} רשומות')),
-      );
-      context.go('/dashboard');
-    } catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('שחזור הגיבוי נכשל: $error')),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {

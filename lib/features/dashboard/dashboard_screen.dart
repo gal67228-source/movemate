@@ -374,10 +374,18 @@ class _SmartInsightsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final insights = <String>[];
-    if (overdueTasks > 0) insights.add('$overdueTasks משימות באיחור');
-    if (unboxedItems > 0) insights.add('$unboxedItems פריטים עדיין ללא ארגז');
-    if (saleWithoutPrice > 0) insights.add('$saleWithoutPrice פריטים למכירה ללא מחיר');
-    if (insights.isEmpty) insights.add('הכול נראה מסודר. המשיכו כך!');
+    if (overdueTasks > 0) {
+      insights.add('$overdueTasks משימות באיחור');
+    }
+    if (unboxedItems > 0) {
+      insights.add('$unboxedItems פריטים עדיין ללא ארגז');
+    }
+    if (saleWithoutPrice > 0) {
+      insights.add('$saleWithoutPrice פריטים למכירה ללא מחיר');
+    }
+    if (insights.isEmpty) {
+      insights.add('הכול נראה מסודר. המשיכו כך!');
+    }
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),

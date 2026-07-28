@@ -192,7 +192,7 @@ ${invite.code}
                                 ),
                                 const SizedBox(height: 14),
                                 DropdownButtonFormField<SharedRole>(
-                                  value: _inviteRole,
+                                  initialValue: _inviteRole,
                                   decoration: const InputDecoration(
                                     labelText: 'הרשאה למוזמן',
                                     prefixIcon: Icon(Icons.admin_panel_settings_outlined),

@@ -1,5 +1,5 @@
 {
-  "version": "0.99.9",
-  "build": 46,
-  "title": "Permissions, backup and release dashboard"
+  "version": "0.99.10",
+  "build": 47,
+  "title": "Fix analyzer issues in backup, dashboard and sharing"
 }

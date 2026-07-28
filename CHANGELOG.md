@@ -1,3 +1,9 @@
+## 0.99.10+47
+
+- Fixed backup actions placement in Settings.
+- Fixed dashboard flow-control lint warnings.
+- Updated sharing role dropdown for current Flutter APIs.
+
 # 0.99.9+46
 
 - נוספו הרשאות Owner/Editor/Viewer לשיתוף.
