@@ -1,3 +1,9 @@
+## 0.99.11+48
+
+- Upgraded `file_picker` for Android API 36 compatibility.
+- CI now installs Android SDK and Build Tools 36.
+- Generated Android projects are explicitly configured with `compileSdk = 36`.
+
 ## 0.99.10+47
 
 - Fixed backup actions placement in Settings.

@@ -71,3 +71,7 @@ MoveMate now supports a Google identity layer while remaining offline-first. Wit
 ## QR codes
 
 MoveMate supports QR generation and scanning for boxes. Photo storage is intentionally not included so the app can remain free to operate.
+
+## Android build compatibility
+
+The CI installs Android SDK 36 and configures generated Android projects with `compileSdk = 36`. This is required by the current Android lifecycle dependencies used by backup file selection.
