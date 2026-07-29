@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/auth/auth_providers.dart';
 import '../../../core/auth/auth_service.dart';
+import '../../../core/storage/local_storage.dart';
 import '../../moves/data/move_repository.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
@@ -22,8 +23,16 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       final user = await service.signInWithGoogle();
       final moveRepository = await ref.read(moveRepositoryProvider.future);
       await moveRepository.assignOwnerToCurrentMove(user.uid);
+
+      // LocalStorage may have been created while the app was in local mode.
+      // Rebuild the complete storage graph after authentication so it attaches
+      // CloudSyncService, uploads existing local records and starts listening
+      // for remote Firestore changes immediately.
       ref.invalidate(authSessionProvider);
+      ref.invalidate(localStorageProvider);
+      ref.invalidate(moveRepositoryProvider);
       ref.invalidate(currentMoveProvider);
+      await ref.read(localStorageProvider.future);
     } on AuthCancelledException {
       // The user closed the Google account chooser.
     } on AuthConfigurationException catch (error) {
