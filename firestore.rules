@@ -30,6 +30,10 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if signedIn() && request.auth.uid == userId;
       allow create, update: if signedIn() && request.auth.uid == userId;
+
+      match /appStorage/{entryId} {
+        allow read, write: if signedIn() && request.auth.uid == userId;
+      }
     }
 
     match /moves/{moveId} {
