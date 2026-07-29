@@ -110,11 +110,12 @@ jobs:
       - name: Verify file selector dependency
         shell: bash
         run: |
-          flutter pub deps --style=compact | grep -E '^file_selector ' || {
+          DEPS="$(flutter pub deps --style=compact)"
+          printf '%s\n' "$DEPS" | grep -E '(^|[[:space:]])file_selector[[:space:]]' || {
             echo "file_selector was not resolved"
             exit 1
           }
-          if flutter pub deps --style=compact | grep -E '^file_picker '; then
+          if printf '%s\n' "$DEPS" | grep -E '(^|[[:space:]])file_picker[[:space:]]'; then
             echo "Unexpected file_picker dependency is still present"
             exit 1
           fi
