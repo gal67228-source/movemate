@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -27,17 +27,21 @@ class BackupService {
       'version': 1,
       'createdAt': createdAt.toIso8601String(),
       'records': records.values
-          .map((record) => <String, Object?>{
-                'key': record.key,
-                'value': record.value,
-                'updatedAt': record.updatedAt.toIso8601String(),
-              })
+          .map(
+            (record) => <String, Object?>{
+              'key': record.key,
+              'value': record.value,
+              'updatedAt': record.updatedAt.toIso8601String(),
+            },
+          )
           .toList(),
     };
     final directory = await getTemporaryDirectory();
     final safeDate = createdAt.toIso8601String().replaceAll(':', '-');
     final file = File('${directory.path}/MoveMate_Backup_$safeDate.json');
-    await file.writeAsString(const JsonEncoder.withIndent('  ').convert(payload));
+    await file.writeAsString(
+      const JsonEncoder.withIndent('  ').convert(payload),
+    );
     await Share.shareXFiles(
       [XFile(file.path, mimeType: 'application/json')],
       subject: 'גיבוי MoveMate',
@@ -47,20 +51,19 @@ class BackupService {
   }
 
   Future<BackupResult?> importBackup() async {
-    final selection = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['json'],
-      withData: true,
+    const jsonFiles = XTypeGroup(
+      label: 'MoveMate JSON backup',
+      extensions: <String>['json'],
+      mimeTypes: <String>['application/json'],
     );
-    if (selection == null || selection.files.isEmpty) {
+    final selected = await openFile(
+      acceptedTypeGroups: const <XTypeGroup>[jsonFiles],
+    );
+    if (selected == null) {
       return null;
     }
-    final selected = selection.files.single;
-    final bytes = selected.bytes ??
-        (selected.path == null ? null : await File(selected.path!).readAsBytes());
-    if (bytes == null) {
-      throw const FormatException('לא ניתן לקרוא את קובץ הגיבוי.');
-    }
+
+    final bytes = await selected.readAsBytes();
     final decoded = jsonDecode(utf8.decode(bytes));
     if (decoded is! Map<String, dynamic> ||
         decoded['format'] != 'movemate-backup' ||
@@ -68,6 +71,7 @@ class BackupService {
         decoded['records'] is! List) {
       throw const FormatException('קובץ הגיבוי אינו בפורמט MoveMate נתמך.');
     }
+
     final records = <StorageRecord>[];
     for (final raw in decoded['records'] as List) {
       if (raw is! Map) {
@@ -82,10 +86,12 @@ class BackupService {
       }
       records.add(StorageRecord(key: key, value: value, updatedAt: updatedAt));
     }
+
     await _database.replaceAllRecords(records);
     return BackupResult(
       recordCount: records.length,
-      createdAt: DateTime.tryParse(decoded['createdAt'] as String? ?? '') ??
+      createdAt:
+          DateTime.tryParse(decoded['createdAt'] as String? ?? '') ??
           DateTime.now(),
     );
   }
