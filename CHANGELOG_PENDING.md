@@ -1,6 +1,7 @@
-# MoveMate 0.99.16
+# MoveMate 0.99.17
 
-- Replaced `file_picker` with Flutter's maintained `file_selector` plugin.
-- Updated JSON backup import to use `openFile` and `XTypeGroup`.
-- Updated CI to verify that `file_selector` is resolved and `file_picker` is absent.
-- Kept Android API 36, Firebase setup, signing, analysis, tests, and release APK build.
+- Added Firebase initialization during app startup.
+- Added local-first Firestore synchronization for all Drift app records.
+- Added timestamp-based conflict resolution between local and cloud data.
+- Added user-scoped Firestore rules for `users/{uid}/appStorage`.
+- Added anonymous authentication fallback when no signed-in Firebase user exists.
