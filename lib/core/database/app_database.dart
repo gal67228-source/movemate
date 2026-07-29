@@ -45,6 +45,16 @@ class AppDatabase extends _$AppDatabase {
 
   Future<Map<String, StorageRecord>> readAllRecords() async {
     final rows = await select(appStorageEntries).get();
+    return _recordsFromRows(rows);
+  }
+
+  Stream<Map<String, StorageRecord>> watchAllRecords() {
+    return select(appStorageEntries).watch().map(_recordsFromRows);
+  }
+
+  Map<String, StorageRecord> _recordsFromRows(
+    List<AppStorageEntry> rows,
+  ) {
     return {
       for (final row in rows)
         row.key: StorageRecord(
