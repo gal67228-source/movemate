@@ -1,7 +1,7 @@
 name: movemate
 description: MoveMate - smart moving manager
 publish_to: 'none'
-version: 0.99.15+52
+version: 0.99.16+53
 
 environment:
   sdk: '>=3.8.0 <4.0.0'
@@ -24,7 +24,7 @@ dependencies:
   share_plus: 10.1.4
   qr_flutter: 4.1.0
   mobile_scanner: 5.2.3
-  file_picker: 10.3.10
+  file_selector: 1.1.0
   path_provider: 2.1.5
 
 dev_dependencies:
