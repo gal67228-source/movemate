@@ -1,5 +1,5 @@
 {
-  "version": "0.99.16",
-  "build": 53,
-  "title": "Replace file_picker with Flutter file_selector"
+  "version": "0.99.17",
+  "build": 54,
+  "title": "Add Firebase cloud synchronization"
 }
