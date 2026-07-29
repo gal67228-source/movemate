@@ -1,3 +1,10 @@
+# Changelog
+
+## 0.99.14+51
+
+- Fixed backup import for file_picker 11 by using the static FilePicker.pickFiles API.
+- Kept Android API 36 and CI workflow fixes intact.
+
 ## 0.99.13+50
 
 - Fix Android SDK 36 installation in GitHub Actions by resolving the full sdkmanager path.
