@@ -1,5 +1,5 @@
 {
-  "version": "0.99.14",
-  "build": 51,
-  "title": "Fix FilePicker 11 API compatibility"
+  "version": "0.99.15",
+  "build": 52,
+  "title": "Fix FilePicker Android plugin registration"
 }

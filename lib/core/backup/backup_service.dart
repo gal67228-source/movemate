@@ -47,7 +47,7 @@ class BackupService {
   }
 
   Future<BackupResult?> importBackup() async {
-    final selection = await FilePicker.pickFiles(
+    final selection = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: const ['json'],
       withData: true,

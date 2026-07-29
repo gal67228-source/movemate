@@ -103,8 +103,19 @@ jobs:
             echo "Signing secrets not configured; using Flutter's development signing fallback."
           fi
 
+      - name: Clean generated Flutter files
+        run: flutter clean
+
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Verify file picker version
+        shell: bash
+        run: |
+          flutter pub deps --style=compact | grep -E '^file_picker ' || {
+            echo "file_picker was not resolved"
+            exit 1
+          }
 
       # Format inside CI and continue. This prevents style-only differences
       # from blocking APK compilation when a ZIP was created on another system.

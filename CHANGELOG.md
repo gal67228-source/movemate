@@ -1,3 +1,10 @@
+# MoveMate 0.99.15
+
+- Downgraded `file_picker` to 10.3.10 to restore the Android `FilePickerPlugin` class used by Flutter plugin registration.
+- Restored the compatible `FilePicker.platform.pickFiles` API.
+- Added `flutter clean` before dependency resolution in CI.
+- Added a CI dependency check for the resolved `file_picker` version.
+
 # Changelog
 
 ## 0.99.14+51
